@@ -399,10 +399,10 @@
       <li>
         <span class="idx-num">03</span>
         <div class="idx-body">
-          <h3>Module 3 — Hermes Conversational AI Agent</h3>
-          <p>An AI tutor on Telegram, sandboxed to the subject syllabus. Guided roleplay, diagnostics, and real-time concept clarification for every student.</p>
+          <h3>Module 3 — Hermes Networking Scenario Engine</h3>
+          <p>A Telegram-based AI tutor for CSF3223 Networking. Students practise diagnostic scenarios, ask syllabus-grounded questions, and generate research telemetry for teaching intervention.</p>
         </div>
-        <span class="badge live">Live on Telegram</span>
+        <span class="badge live">Phase 6 Complete</span>
       </li>
       <li>
         <span class="idx-num">04</span>
@@ -585,34 +585,35 @@
   <!-- ══ MODULE 3 ══ -->
   <section class="screen" id="module3">
     <div class="hero">
-      <span class="status-pill live">Live</span>
-      <p class="path">root/<span>module_03</span>/hermes-bot</p>
-      <h1>Module 3 — Hermes Bot (Telegram)<span class="cursor"></span></h1>
-      <p>Students interact in real time with Hermes — an AI tutor on Telegram, sandboxed to the subject syllabus via a guardrail engine. Guided roleplay, conceptual diagnostics, and real-time application questions keep every conversation within scope.</p>
+      <span class="status-pill live">Pilot Ready</span>
+      <p class="path">root/<span>module_03</span>/hermes-education</p>
+      <h1>Module 3 — Hermes Networking Tutor<span class="cursor"></span></h1>
+      <p>Hermes turns CSF3223 Networking into a Telegram-based diagnostic lab. Students investigate 15 scenario cases, request progressive hints, submit evidence-based answers, and use /ask for syllabus-grounded support from the real course materials.</p>
     </div>
     <div class="meta">
-      <span class="meta-chip">STATUS: FUNCTIONAL</span>
-      <span class="meta-chip">PLATFORM: TELEGRAM</span>
-      <span class="meta-chip">TIER 2 — AI ENGINE LAYER</span>
+      <span class="meta-chip">STATUS: PHASE 6 COMPLETE</span>
+      <span class="meta-chip">BOT: @csf3223_networkbot</span>
+      <span class="meta-chip">15 MVP SCENARIOS</span>
+      <span class="meta-chip">398 chunks indexed</span>
     </div>
 
-    <div class="label">Live Demo (Mockup)<span class="rule"></span></div>
+    <div class="label">Proposal Demo Flow<span class="rule"></span></div>
     <div class="chat-wrap">
       <div class="chat-hdr">
         <div class="chat-hdr-left">
           <div class="bot-av">🪬</div>
           <div>
-            <div class="bot-name">Hermes Bot</div>
-            <div class="bot-stat"><span class="stat-dot"></span>Online · Syllabus sandboxed</div>
+            <div class="bot-name">CSF3223 Hermes</div>
+            <div class="bot-stat"><span class="stat-dot"></span>@csf3223_networkbot · course guarded</div>
           </div>
         </div>
-        <a class="tg-btn" href="https://t.me/HermesBotPlaceholder" target="_blank">📨 Open in Telegram</a>
+        <a class="tg-btn" href="https://t.me/csf3223_networkbot" target="_blank">📨 Open in Telegram</a>
       </div>
       <div class="chat-subj-tabs">
-        <button class="cst active" onclick="switchChat('wba',this)">WBA Dev</button>
-        <button class="cst" onclick="switchChat('oop',this)">OOP</button>
-        <button class="cst" onclick="switchChat('ir',this)">Info Retrieval</button>
-        <button class="cst" onclick="switchChat('os',this)">OS</button>
+        <button class="cst active" onclick="switchChat('net001',this)">NET001 Gateway</button>
+        <button class="cst" onclick="switchChat('net013',this)">NET013 SVI</button>
+        <button class="cst" onclick="switchChat('net053',this)">NET053 Route</button>
+        <button class="cst" onclick="switchChat('ask',this)">/ask RAG</button>
       </div>
       <div class="chat-msgs" id="chat-msgs"></div>
       <div class="chat-sugg" id="chat-sugg"></div>
@@ -622,9 +623,9 @@
       </div>
     </div>
     <div class="cards" style="margin-top:4px;">
-      <div class="card"><h4>Syllabus-sandboxed</h4><p>Guardrail engine prevents Hermes from answering outside the approved subject scope — students stay on topic.</p></div>
-      <div class="card"><h4>Roleplay mode</h4><p>Hermes can simulate system scenarios (e.g. a compromised server, a deadlocked process) for diagnostic practice.</p></div>
-      <div class="card"><h4>Telemetry logging</h4><p>Every interaction is anonymously logged to the Central Data Aggregator, feeding the Module 4 dashboard.</p></div>
+      <div class="card"><h4>Scenario roleplay</h4><p>All 15 MVP cases map to CSF3223 Chapters 1–10: gateway, IOS, SVI, ARP, cabling, routing, subnetting, IPv6, TCP, DNS, and DHCP.</p></div>
+      <div class="card"><h4>Grounded /ask tutor</h4><p>23 syllabus, lecture, and lab files are converted into 398 searchable chunks so answers stay tied to approved course materials.</p></div>
+      <div class="card"><h4>Research telemetry</h4><p>Sessions log hints, attempts, confidence checks, scores, reflections, and guardrail rejections for instructor analytics and proposal evidence.</p></div>
     </div>
   </section>
 
@@ -733,17 +734,17 @@ function doGen(){
 
 // ── MODULE 3: chat ──
 const chatData={
-  wba:{greeting:"Init sequence complete. I'm Hermes — your AI tutor for Web Based Application Development. Ask me about HTTP, client-server architecture, REST APIs, sessions, or anything from your syllabus.",
-    suggested:['How does HTTP GET differ from POST?','Explain client-server architecture','What is session vs cookie?']},
-  oop:{greeting:"System online. I'm Hermes — OOP tutor. Inheritance trees, polymorphic dispatch, encapsulation, design patterns — what do you need to understand?",
-    suggested:['Difference: abstract class vs interface?','Explain polymorphism with example','What are SOLID principles?']},
-  ir:{greeting:"Hermes active — Information Retrieval module loaded. Let's explore web crawling, TF-IDF, precision-recall. What's unclear?",
-    suggested:['How does a search engine index pages?','What is TF-IDF?','Explain precision vs recall']},
-  os:{greeting:"Hermes online — OS module engaged. Scheduling algorithms, memory management, deadlock, virtual memory — ask away.",
-    suggested:['Explain round-robin scheduling','What causes a deadlock?','How does virtual memory work?']}
+  net001:{greeting:"/scenario NET001 loaded: The Missing Gateway. Student-PC-01 can ping another PC in the same room, but cannot reach the Internet. Investigate the evidence, ask for hints only when needed, then submit your diagnosis.",
+    suggested:['ipconfig','ping 8.8.8.8','/answer missing default gateway']},
+  net013:{greeting:"/scenario NET013 loaded: The Silent Management Interface. The switch forwards traffic, but the lecturer cannot ping its management address. Use IOS evidence to identify why VLAN 1 management is silent.",
+    suggested:['show ip interface brief','interface vlan 1 / no shutdown','/hint']},
+  net053:{greeting:"/scenario NET053 loaded: The Missing Static Route. A router-to-LAN path partially works, but remote reachability fails. Students must inspect routes, apply a valid static route, and validate end-to-end recovery.",
+    suggested:['show ip route','traceroute remote LAN','ip route 192.168.30.0 255.255.255.0 192.168.20.2']},
+  ask:{greeting:"/ask mode is active. Hermes searches 23 CSF3223 source files converted into 398 full-text chunks, then answers only when the question matches the Networking syllabus, lectures, or lab materials.",
+    suggested:['/ask What is the difference between TCP and UDP?','/ask Why does same-LAN ping work without a gateway?','/ask Can you scan the real UMT network?']}
 };
-const chatHist={wba:[],oop:[],ir:[],os:[]};
-let curChat='wba';
+const chatHist={net001:[],net013:[],net053:[],ask:[]};
+let curChat='net001';
 function switchChat(id,btn){
   curChat=id;
   document.querySelectorAll('.cst').forEach(t=>t.classList.remove('active'));
@@ -757,7 +758,7 @@ function renderChat(id){
     chatHist[id].map(m=>`<div class="msg ${m.r}"><div class="msg-av">${m.r==='bot'?'🪬':'〉'}</div><div class="bubble">${m.t}</div></div>`).join('');
   msgs.scrollTop=msgs.scrollHeight;
   document.getElementById('chat-sugg').innerHTML=d.suggested.map(q=>`<button class="sugg" onclick="sendSugg('${q.replace(/'/g,"\\'")}',this)">${q}</button>`).join('');
-  document.getElementById('chat-inp').placeholder=`Ask Hermes about ${id.toUpperCase()}...`;
+  document.getElementById('chat-inp').placeholder=id==='ask'?'Try a CSF3223 /ask question...':`Run a command in ${id.toUpperCase()}...`;
 }
 function sendSugg(q,btn){btn.style.opacity='0.4';btn.disabled=true;document.getElementById('chat-inp').value=q;sendMsg();}
 function sendMsg(){
@@ -774,12 +775,26 @@ function sendMsg(){
   msgs.appendChild(tp);msgs.scrollTop=msgs.scrollHeight;
   setTimeout(()=>{
     tp.remove();
-    const reply=`// MOCKUP MODE — Hermes Bot is live on Telegram. <a href="https://t.me/HermesBotPlaceholder" target="_blank" style="color:var(--cyan)">Open Hermes on Telegram →</a> to get real AI tutoring sandboxed to your syllabus. <span style="color:var(--text-faint)">[query logged: "${text}"]</span>`;
+    const reply=buildHermesReply(curChat,text);
     const bm=document.createElement('div');bm.className='msg bot';
     bm.innerHTML=`<div class="msg-av">🪬</div><div class="bubble">${reply}</div>`;
     chatHist[curChat].push({r:'bot',t:reply});
     msgs.appendChild(bm);msgs.scrollTop=msgs.scrollHeight;
   },1400);
+}
+function buildHermesReply(mode,text){
+  if(mode==='ask' && /scan|hack|attack|credential|real\s+umt/i.test(text)){
+    return `Guardrail redirected: I can help with CSF3223 Networking concepts and lab-safe simulations, but I cannot assist with scanning or attacking real networks. Try asking about TCP/UDP, DNS, DHCP, routing, subnetting, or Packet Tracer validation.`;
+  }
+  if(mode==='ask'){
+    return `RAG answer preview: Hermes retrieves relevant CSF3223 syllabus, lecture, and lab chunks before answering. The real bot cites course-grounded context, stores the question for research telemetry, and rejects out-of-scope prompts before any LLM call. <a href="https://t.me/csf3223_networkbot" target="_blank" style="color:var(--cyan)">Open @csf3223_networkbot →</a>`;
+  }
+  const flow={
+    net001:'Evidence pattern: local connectivity works, external reachability fails, and ipconfig shows the gateway field is blank. Diagnosis target: missing default gateway; validation: set 192.168.1.1 and retest remote ping.',
+    net013:'Evidence pattern: Vlan1 is administratively down and has no management IP. Diagnosis target: silent switch virtual interface; remediation: configure the SVI, no shutdown, and validate lecturer ping.',
+    net053:'Evidence pattern: connected networks are present, but the remote LAN route is missing. Diagnosis target: incomplete static routing; remediation: add the route, then validate with ping and traceroute.'
+  };
+  return `${flow[mode]} <span style="color:var(--text-faint)">[telemetry captured: command, hint usage, attempt path, resolution timing]</span>`;
 }
 
 // ── MODULE 4: dashboard ──
@@ -841,7 +856,7 @@ function renderM4(id){
 }
 
 // ── INIT ──
-renderChat('wba');
+renderChat('net001');
 renderM4('wba');
 </script>
 </body>
