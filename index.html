@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VisualizeAI — Simulation Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E13;
+    --bg-panel:#11161D;
+    --bg-raised:#161C24;
+    --line:#232C36;
+    --cyan:#4FE3C1;
+    --cyan-dim:rgba(79,227,193,.14);
+    --amber:#FFB454;
+    --amber-dim:rgba(255,180,84,.14);
+    --green:#52D68A;
+    --green-dim:rgba(82,214,138,.12);
+    --purple:#A78BFA;
+    --purple-dim:rgba(167,139,250,.12);
+    --text:#E7EDF3;
+    --text-dim:#7C8A99;
+    --text-faint:#4B5560;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%,rgba(79,227,193,.06),transparent 45%),
+      radial-gradient(circle at 85% 100%,rgba(255,180,84,.05),transparent 45%),
+      var(--bg);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;
+    background:repeating-linear-gradient(to bottom,rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,transparent 1px,transparent 3px);
+    pointer-events:none;z-index:999;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .frame{max-width:900px;margin:0 auto;padding:26px 22px 80px;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:16px;margin-bottom:6px;border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-dim);font-weight:600;
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .clock{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-faint);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 34px;}
+  .tab{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+    padding:10px 16px;background:var(--bg-panel);border:1px solid var(--line);color:var(--text-dim);
+    cursor:pointer;display:flex;align-items:center;gap:8px;
+    transition:border-color .15s,color .15s,background .15s;position:relative;
+  }
+  .tab:hover{color:var(--text);border-color:var(--cyan);}
+  .tab .idx{color:var(--text-faint);}
+  .tab.active{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-dim);}
+  .tab.active .idx{color:var(--cyan);}
+  .tab .led{width:6px;height:6px;border-radius:50%;background:var(--text-faint);margin-left:2px;}
+  .tab .led.ready{background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+  .tab .led.pending{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+  .screen{display:none;animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .hero{
+    position:relative;background:var(--bg-panel);border:1px solid var(--line);
+    border-left:3px solid var(--cyan);padding:28px 26px;margin-bottom:36px;
+  }
+  .hero .path{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-faint);margin:0 0 14px;}
+  .hero .path span{color:var(--cyan);}
+  .hero h1{font-family:'JetBrains Mono',monospace;font-size:clamp(20px,3.5vw,28px);margin:0 0 12px;font-weight:700;color:var(--text);}
+  .hero h1 .cursor{display:inline-block;width:10px;height:20px;background:var(--cyan);margin-left:8px;vertical-align:-3px;animation:blink 1s step-end infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .hero p{margin:0;color:var(--text-dim);font-size:15px;line-height:1.6;max-width:580px;}
+  .status-pill{
+    position:absolute;top:24px;right:24px;
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;padding:6px 12px;border:1px solid var(--cyan);color:var(--cyan);background:var(--cyan-dim);
+  }
+  .status-pill.pending{border-color:var(--amber);color:var(--amber);background:var(--amber-dim);}
+  .status-pill.live{border-color:var(--green);color:var(--green);background:var(--green-dim);}
+  .label{
+    display:flex;align-items:center;gap:10px;margin:0 0 16px;
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);
+  }
+  .label::before{content:"//";color:var(--cyan);}
+  .label .rule{flex:1;height:1px;background:var(--line);}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;}
+  .meta-chip{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
+    color:var(--text-dim);border:1px solid var(--line);padding:6px 10px;background:var(--bg-panel);
+  }
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:10px;}
+  .card{
+    position:relative;background:var(--bg-panel);border:1px solid var(--line);
+    padding:18px 18px 18px 22px;
+  }
+  .card::before{content:"";position:absolute;top:0;left:0;width:24px;height:2px;background:var(--cyan);}
+  .card h4{margin:0 0 8px;font-size:14.5px;font-weight:600;color:var(--text);}
+  .card p{margin:0;font-size:13px;color:var(--text-dim);line-height:1.55;}
+
+  /* subject links */
+  .subjects{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+  .subject-link{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:15px 18px;border:1px solid var(--line);background:var(--bg-panel);
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text);font-weight:600;
+    text-decoration:none;transition:border-color .15s,background .15s,transform .1s;
+  }
+  .subject-link:hover{border-color:var(--cyan);background:var(--bg-raised);transform:translateX(2px);}
+  .subject-link .code{color:var(--text-faint);font-weight:500;margin-right:12px;}
+  .subject-link .go{color:var(--cyan);font-size:11px;letter-spacing:.04em;}
+
+  /* index list */
+  .index{list-style:none;margin:0 0 44px;padding:0;border:1px solid var(--line);background:var(--bg-panel);}
+  .index li{display:grid;grid-template-columns:38px 1fr auto;gap:14px;align-items:start;padding:16px 18px;border-bottom:1px solid var(--line);}
+  .index li:last-child{border-bottom:none;}
+  .index li:hover{background:var(--bg-raised);}
+  .idx-num{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-faint);padding-top:2px;}
+  .idx-body h3{margin:0 0 4px;font-size:15.5px;font-weight:600;color:var(--text);}
+  .idx-body p{margin:0;font-size:13px;color:var(--text-dim);line-height:1.5;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:5px 9px;border-radius:2px;white-space:nowrap;height:fit-content;}
+  .badge.ready{color:var(--cyan);border:1px solid var(--cyan);background:var(--cyan-dim);}
+  .badge.pending{color:var(--amber);border:1px solid var(--amber);background:var(--amber-dim);}
+  .badge.live{color:var(--green);border:1px solid var(--green);background:var(--green-dim);}
+
+  /* details/accordion */
+  .subjects-acc{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+  details{border:1px solid var(--line);background:var(--bg-panel);overflow:hidden;}
+  details[open]{border-color:var(--cyan);}
+  summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text);font-weight:600;}
+  summary::-webkit-details-marker{display:none;}
+  summary .code{color:var(--text-faint);font-weight:500;margin-right:12px;}
+  summary .chev{color:var(--cyan);transition:transform .2s;}
+  details[open] summary .chev{transform:rotate(180deg);}
+  .panel{padding:2px 18px 20px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--text-dim);line-height:1.6;}
+
+  /* empty note */
+  .empty-note{border:1px dashed var(--line);padding:22px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-faint);letter-spacing:.04em;}
+
+  /* ── MODULE 2: roles + sources ── */
+  .roles-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .role-chip{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
+    padding:7px 12px;border:1px solid var(--line);background:var(--bg-panel);
+    color:var(--text-dim);cursor:pointer;transition:all .15s;
+  }
+  .role-chip:hover,.role-chip.on{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim);}
+  .src-row{display:flex;gap:8px;margin-bottom:10px;}
+  .src-inp{
+    flex:1;background:var(--bg);border:1px solid var(--line);
+    padding:9px 14px;font-size:12px;color:var(--text);
+    font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .15s;
+  }
+  .src-inp:focus{border-color:var(--cyan);}
+  .src-inp::placeholder{color:var(--text-faint);}
+  .src-add{
+    padding:9px 16px;background:var(--cyan-dim);border:1px solid var(--cyan);
+    color:var(--cyan);font-size:12px;font-weight:600;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;transition:all .15s;white-space:nowrap;
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+  .src-add:hover{background:rgba(79,227,193,.25);}
+  .src-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:14px;}
+  .src-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 12px;background:var(--bg);border:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text);
+  }
+  .src-rm{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;transition:color .15s;}
+  .src-rm:hover{color:#FC8181;}
+  .src-empty{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-faint);padding:12px 0;text-align:center;letter-spacing:.04em;}
+  .gen-btn{
+    width:100%;padding:13px;background:var(--cyan-dim);border:1px solid var(--cyan);
+    color:var(--cyan);font-size:12px;font-weight:700;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;
+    transition:all .15s;
+  }
+  .gen-btn:hover:not(:disabled){background:rgba(79,227,193,.25);}
+  .gen-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .workflow{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);margin-bottom:20px;}
+  .wf-step{
+    display:flex;align-items:flex-start;gap:14px;padding:14px 18px;
+    border-bottom:1px solid var(--line);background:var(--bg-panel);
+  }
+  .wf-step:last-child{border-bottom:none;}
+  .wf-num{
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    color:var(--cyan);width:20px;flex-shrink:0;padding-top:2px;
+  }
+  .wf-body h4{margin:0 0 3px;font-size:13.5px;font-weight:600;color:var(--text);}
+  .wf-body p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.5;}
+
+  /* ── MODULE 3: chat ── */
+  .chat-wrap{border:1px solid var(--line);background:var(--bg-panel);overflow:hidden;margin-bottom:20px;}
+  .chat-hdr{
+    padding:12px 18px;background:var(--bg-raised);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .chat-hdr-left{display:flex;align-items:center;gap:10px;}
+  .bot-av{
+    width:32px;height:32px;border-radius:2px;
+    background:linear-gradient(135deg,#5E35B1,var(--purple));
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .bot-name{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);}
+  .bot-stat{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);display:flex;align-items:center;gap:5px;}
+  .stat-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+  .tg-btn{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+    padding:6px 12px;border:1px solid var(--line);color:var(--text-dim);
+    text-decoration:none;transition:all .15s;
+  }
+  .tg-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+  .chat-subj-tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;}
+  .cst{
+    font-family:'JetBrains Mono',monospace;font-size:11px;padding:9px 14px;
+    color:var(--text-faint);cursor:pointer;border:none;background:transparent;
+    border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;
+  }
+  .cst:hover{color:var(--text);}
+  .cst.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+  .chat-msgs{height:260px;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
+  .chat-msgs::-webkit-scrollbar{width:4px;}
+  .chat-msgs::-webkit-scrollbar-thumb{background:var(--line);}
+  .msg{display:flex;gap:8px;max-width:90%;}
+  .msg.bot{align-self:flex-start;}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse;}
+  .msg-av{width:26px;height:26px;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:2px;}
+  .msg.bot .msg-av{background:linear-gradient(135deg,#5E35B1,var(--purple));}
+  .msg.user .msg-av{background:var(--cyan-dim);border:1px solid var(--cyan);}
+  .bubble{padding:9px 13px;font-size:12.5px;line-height:1.55;}
+  .msg.bot .bubble{background:var(--bg-raised);border:1px solid var(--line);color:var(--text);}
+  .msg.user .bubble{background:var(--cyan-dim);border:1px solid rgba(79,227,193,.3);color:var(--text);}
+  .typing-wrap{display:flex;gap:4px;align-items:center;padding:4px 0;}
+  .typing-wrap span{width:6px;height:6px;background:var(--text-faint);border-radius:50%;animation:bounce 1s infinite;}
+  .typing-wrap span:nth-child(2){animation-delay:.15s;}
+  .typing-wrap span:nth-child(3){animation-delay:.3s;}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+  .chat-sugg{padding:8px 14px;border-top:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap;}
+  .sugg{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;
+    padding:5px 10px;border:1px solid var(--line);background:var(--bg);color:var(--text-faint);
+    cursor:pointer;transition:all .15s;
+  }
+  .sugg:hover{border-color:var(--cyan);color:var(--cyan);}
+  .chat-inp-row{
+    padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:8px;background:var(--bg-raised);
+  }
+  .chat-inp{
+    flex:1;background:var(--bg);border:1px solid var(--line);padding:9px 14px;
+    font-size:12px;color:var(--text);font-family:'JetBrains Mono',monospace;
+    outline:none;transition:border-color .15s;
+  }
+  .chat-inp:focus{border-color:var(--cyan);}
+  .chat-inp::placeholder{color:var(--text-faint);}
+  .chat-send{
+    padding:9px 18px;background:var(--cyan-dim);border:1px solid var(--cyan);
+    color:var(--cyan);font-size:11px;font-weight:700;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;
+    transition:all .15s;
+  }
+  .chat-send:hover{background:rgba(79,227,193,.25);}
+
+  /* ── MODULE 4: dashboard ── */
+  .dash-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+  .metric{background:var(--bg-panel);border:1px solid var(--line);padding:18px;}
+  .metric-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;}
+  .metric-val{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:800;margin-bottom:4px;}
+  .metric-desc{font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.4;}
+  .bar-bg{height:3px;background:var(--line);}
+  .bar-fill{height:100%;transition:width 1.2s ease;}
+  .heatmap-wrap{background:var(--bg-panel);border:1px solid var(--line);padding:20px;margin-bottom:20px;}
+  .heatmap-title{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;}
+  .hm-subj-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .hmst{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+    padding:5px 10px;border:1px solid var(--line);background:var(--bg);color:var(--text-faint);
+    cursor:pointer;transition:all .15s;
+  }
+  .hmst:hover{color:var(--text);border-color:var(--line);}
+  .hmst.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim);}
+  table.hm-table{width:100%;border-collapse:separate;border-spacing:3px;}
+  table.hm-table th{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);text-align:center;padding:2px 4px;font-weight:500;}
+  table.hm-table td.hm-topic{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-dim);padding-right:12px;white-space:nowrap;}
+  table.hm-table td.hm-cell{height:24px;min-width:40px;border-radius:2px;}
+  .hm-legend{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);}
+  .hm-legend-swatch{display:flex;gap:3px;}
+  .hm-legend-swatch div{width:18px;height:8px;border-radius:1px;}
+  .actions-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);}
+  .act-row{
+    display:flex;align-items:flex-start;gap:14px;padding:15px 18px;
+    border-bottom:1px solid var(--line);background:var(--bg-panel);
+  }
+  .act-row:last-child{border-bottom:none;}
+  .act-badge{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    font-weight:700;padding:4px 9px;border-radius:2px;white-space:nowrap;flex-shrink:0;margin-top:2px;
+  }
+  .act-badge.high{color:var(--amber);border:1px solid var(--amber);background:var(--amber-dim);}
+  .act-badge.med{color:var(--cyan);border:1px solid var(--cyan);background:var(--cyan-dim);}
+  .act-badge.low{color:var(--green);border:1px solid var(--green);background:var(--green-dim);}
+  .act-body h4{font-size:13.5px;font-weight:600;color:var(--text);margin:0 0 4px;}
+  .act-body p{font-size:12.5px;color:var(--text-dim);line-height:1.5;margin:0;}
+
+  footer{
+    margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-faint);
+    display:flex;justify-content:space-between;
+  }
+  @media(max-width:600px){
+    .index li{grid-template-columns:1fr;}
+    .idx-num{display:none;}
+    .status-pill{position:static;display:inline-block;margin-bottom:14px;}
+    nav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
+    .dash-metrics{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>visualize_ai.sys</div>
+    <div class="clock mono" id="clock">--:--:--</div>
+  </div>
+
+  <nav>
+    <button class="tab active" data-target="home"><span class="idx">00</span> Home</button>
+    <button class="tab" data-target="module1"><span class="idx">01</span> Module 1 <span class="led ready"></span></button>
+    <button class="tab" data-target="module2"><span class="idx">02</span> Module 2 <span class="led pending"></span></button>
+    <button class="tab" data-target="module3"><span class="idx">03</span> Module 3 <span class="led ready"></span></button>
+    <button class="tab" data-target="module4"><span class="idx">04</span> Module 4 <span class="led pending"></span></button>
+  </nav>
+
+  <!-- ══ HOME ══ -->
+  <section class="screen active" id="home">
+    <div class="hero">
+      <span class="status-pill">RICH 2026</span>
+      <p class="path">root/<span>overview</span>/visualize-ai</p>
+      <h1>Visualising the Invisible<span class="cursor"></span></h1>
+      <p>A generative AI-powered learning platform that transforms abstract computer science concepts into interactive visual simulations — making the invisible visible for students who can read about processes but cannot see them.</p>
+    </div>
+
+    <div class="label">What this is<span class="rule"></span></div>
+    <div class="cards" style="grid-template-columns:1fr;margin-bottom:36px;">
+      <div class="card">
+        <h4>The Problem</h4>
+        <p>Abstract CS concepts — process scheduling, boolean logic, web crawling, confusion matrices — exist only as text and static diagrams in lecture slides. Students memorise definitions without ever seeing the concept behave. This gap between knowing and understanding is what VisualizeAI closes.</p>
+      </div>
+    </div>
+
+    <div class="label">Objectives<span class="rule"></span></div>
+    <div class="cards" style="margin-bottom:36px;">
+      <div class="card">
+        <h4>Visualise abstract concepts</h4>
+        <p>Use Gemini Canvas and NotebookLM to generate interactive, step-by-step simulations of concepts that students historically find hardest to understand.</p>
+      </div>
+      <div class="card">
+        <h4>Enable active learning</h4>
+        <p>Move students from passive readers to active explorers — curating sources, synthesizing knowledge, and querying an AI tutor in real time.</p>
+      </div>
+      <div class="card">
+        <h4>Measure cognitive load</h4>
+        <p>Surface where students struggle using real analytics — Conceptual Friction Index, Time-to-Resolution, and Syllabus Heatmap — so instructors can intervene before exam time.</p>
+      </div>
+    </div>
+
+    <div class="label">System overview<span class="rule"></span></div>
+    <ul class="index" style="margin-bottom:36px;">
+      <li>
+        <span class="idx-num">01</span>
+        <div class="idx-body">
+          <h3>Module 1 — Conceptual Visualization</h3>
+          <p>NotebookLM consolidates course materials. Gemini Canvas generates interactive simulations. Students explore concepts visually instead of memorising text.</p>
+        </div>
+        <span class="badge ready">Live</span>
+      </li>
+      <li>
+        <span class="idx-num">02</span>
+        <div class="idx-body">
+          <h3>Module 2 — AI Co-Creation Assessment</h3>
+          <p>Groups of up to three students curate 5–12 credible sources. NotebookLM synthesizes them into structured reports, evidence maps, and citations.</p>
+        </div>
+        <span class="badge pending">In Progress</span>
+      </li>
+      <li>
+        <span class="idx-num">03</span>
+        <div class="idx-body">
+          <h3>Module 3 — Hermes Conversational AI Agent</h3>
+          <p>An AI tutor on Telegram, sandboxed to the subject syllabus. Guided roleplay, diagnostics, and real-time concept clarification for every student.</p>
+        </div>
+        <span class="badge live">Live on Telegram</span>
+      </li>
+      <li>
+        <span class="idx-num">04</span>
+        <div class="idx-body">
+          <h3>Module 4 — Cognitive Load Analytics Dashboard</h3>
+          <p>Real-time metrics — CFI, TTR, Syllabus Heatmap — tell instructors exactly where students struggle so targeted support can happen before it is too late.</p>
+        </div>
+        <span class="badge pending">Preview</span>
+      </li>
+    </ul>
+
+    <div class="label">Scope<span class="rule"></span></div>
+    <div class="meta">
+      <span class="meta-chip">4 MODULES</span>
+      <span class="meta-chip">4 SUBJECTS</span>
+      <span class="meta-chip">2 TECHNICAL · 2 THEORETICAL</span>
+      <span class="meta-chip">50 STUDENTS TESTED</span>
+      <span class="meta-chip">100% FOUND IT HELPFUL</span>
+    </div>
+
+    <div class="label">Evidence<span class="rule"></span></div>
+    <div class="cards" style="margin-bottom:0;">
+      <div class="card" style="--accent:var(--cyan)">
+        <h4 style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--cyan)">100%</h4>
+        <p>of students confirmed that simulations directly aided their understanding of abstract concepts</p>
+      </div>
+      <div class="card">
+        <h4 style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--cyan)">70%</h4>
+        <p>rated the help as substantial — the remaining 30% rated it as moderate. Zero reported no help.</p>
+      </div>
+      <div class="card">
+        <h4 style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--cyan)">4</h4>
+        <p>courses across 2 technical (WBA Dev, OOP) and 2 theoretical (Information Retrieval, Operating System) subjects</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MODULE 1 ══ -->
+  <section class="screen" id="module1">
+    <div class="hero">
+      <span class="status-pill">Ready</span>
+      <p class="path">root/<span>module_01</span>/conceptual-visualization</p>
+      <h1>Module 1 — Conceptual Visualization<span class="cursor"></span></h1>
+      <p>Instructors design structured pedagogical sequences to translate invisible concepts into visual, step-by-step simulations. Built with NotebookLM (knowledge consolidation) and Gemini Canvas (simulation generation), grounded in Cognitive Theory of Multimedia Learning and Cognitive Load Theory.</p>
+    </div>
+    <div class="meta">
+      <span class="meta-chip">STATUS: READY</span>
+      <span class="meta-chip">TOOL: NOTEBOOKLM + GEMINI CANVAS</span>
+      <span class="meta-chip">TIER 1</span>
+    </div>
+
+    <div class="label">Simulations by Subject<span class="rule"></span></div>
+    <div class="subjects-acc">
+
+      <details>
+        <summary>
+          <span><span class="code mono">SUBJ.01</span>Web Based Application Development</span>
+          <span class="chev">▾</span>
+        </summary>
+        <div class="panel">
+          <p><strong>Concept visualised:</strong> HTTP Request Lifecycle &amp; Client-Server Architecture</p>
+          <p style="margin-top:8px"><strong>Why it was invisible:</strong> Students read about GET and POST requests but cannot see the actual packet journey — what happens between typing a URL and a page appearing.</p>
+          <p style="margin-top:8px"><strong>Simulation:</strong> Interactive step-through of an HTTP request from browser to server and back, showing headers, status codes, and state changes at each hop.</p>
+          <p style="margin-top:12px">
+            <a class="subject-link" href="https://sites.google.com/umt.edu.my/spiderbotsimulator/simulator" target="_blank" rel="noopener" style="margin-top:0">
+              <span><span class="code mono">SIM.01</span>Open Simulation ↗</span>
+              <span class="go">sites.google.com/umt.edu.my/spiderbotsimulator</span>
+            </a>
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span><span class="code mono">SUBJ.02</span>Object Oriented Programming</span>
+          <span class="chev">▾</span>
+        </summary>
+        <div class="panel">
+          <p><strong>Concept visualised:</strong> Boolean Logic, Inheritance &amp; Polymorphism</p>
+          <p style="margin-top:8px"><strong>Why it was invisible:</strong> Students memorise class diagrams and truth tables without seeing how objects relate, how method dispatch flows, or how gates behave when inputs toggle.</p>
+          <p style="margin-top:8px"><strong>Simulation:</strong> Interactive logic gate simulation — students toggle inputs and watch how the logical structure responds in real time.</p>
+          <p style="margin-top:12px">
+            <a class="subject-link" href="https://sites.google.com/umt.edu.my/booleanlogicunderstanding/enter-here" target="_blank" rel="noopener" style="margin-top:0">
+              <span><span class="code mono">SIM.02</span>Open Simulation ↗</span>
+              <span class="go">sites.google.com/umt.edu.my/booleanlogicunderstanding</span>
+            </a>
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span><span class="code mono">SUBJ.03</span>Information Retrieval</span>
+          <span class="chev">▾</span>
+        </summary>
+        <div class="panel">
+          <p><strong>Concept visualised:</strong> Web Crawling, Indexing &amp; Ranking (Spider Bot)</p>
+          <p style="margin-top:8px"><strong>Why it was invisible:</strong> A spider bot traverses millions of pages in milliseconds — the decision sequence at each node is invisible without a simulation to step through.</p>
+          <p style="margin-top:8px"><strong>Simulation:</strong> Interactive Spider Bot — students trigger the crawl, watch indexing decisions happen in sequence, and see why certain pages rank before others.</p>
+          <p style="margin-top:12px">
+            <a class="subject-link" href="https://sites.google.com/umt.edu.my/spiderbotsimulator/simulator" target="_blank" rel="noopener" style="margin-top:0">
+              <span><span class="code mono">SIM.03</span>Open Simulation ↗</span>
+              <span class="go">sites.google.com/umt.edu.my/spiderbotsimulator</span>
+            </a>
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span><span class="code mono">SUBJ.04</span>Operating System</span>
+          <span class="chev">▾</span>
+        </summary>
+        <div class="panel">
+          <p><strong>Concept visualised:</strong> Process Scheduling &amp; Memory Management (Confusion Matrix for OS Metrics)</p>
+          <p style="margin-top:8px"><strong>Why it was invisible:</strong> CPU scheduling happens in microseconds — without a simulation, students guess at round-robin and priority algorithms without seeing the decision logic execute.</p>
+          <p style="margin-top:8px"><strong>Simulation:</strong> Interactive simulation linking process states to scheduling decisions, with a Confusion Matrix showing how shifting parameters reshapes OS performance metrics live.</p>
+          <p style="margin-top:12px">
+            <a class="subject-link" href="https://sites.google.com/umt.edu.my/confusionmatrix/home" target="_blank" rel="noopener" style="margin-top:0">
+              <span><span class="code mono">SIM.04</span>Open Simulation ↗</span>
+              <span class="go">sites.google.com/umt.edu.my/confusionmatrix</span>
+            </a>
+          </p>
+        </div>
+      </details>
+
+    </div>
+    <p class="mono" style="font-size:11px;color:var(--amber);letter-spacing:.04em;margin-top:10px;">
+      ⚠ Ensure Google Sites sharing is set to "Anyone with the link" before the demo on 9 July.
+    </p>
+  </section>
+
+  <!-- ══ MODULE 2 ══ -->
+  <section class="screen" id="module2">
+    <div class="hero">
+      <span class="status-pill pending">In Progress</span>
+      <p class="path">root/<span>module_02</span>/ai-cocreation-assessments</p>
+      <h1>Module 2 — AI Co-Creation Assessment<span class="cursor"></span></h1>
+      <p>Students form groups of up to three to curate 5–12 credible technical sources. NotebookLM synthesizes these into structured evidence maps, reports, summaries, and citations — with each group member assigned a specific role in the process.</p>
+    </div>
+    <div class="meta">
+      <span class="meta-chip">STATUS: IN PROGRESS</span>
+      <span class="meta-chip">TOOL: NOTEBOOKLM</span>
+      <span class="meta-chip">TIER 1</span>
+    </div>
+
+    <div class="label">NotebookLM Synthesis Workflow<span class="rule"></span></div>
+    <div class="workflow" style="margin-bottom:28px;">
+      <div class="wf-step"><div class="wf-num">01</div><div class="wf-body"><h4>Consolidate Sources</h4><p>Students curate 5–12 credible technical sources (journals, documentation, verified articles) as input files.</p></div></div>
+      <div class="wf-step"><div class="wf-num">02</div><div class="wf-body"><h4>Information Synthesis</h4><p>NotebookLM processes all sources, extracts key concepts and relationships, and builds a knowledge model.</p></div></div>
+      <div class="wf-step"><div class="wf-num">03</div><div class="wf-body"><h4>Prompt Execution</h4><p>Structured prompts guide generation of specific artifact types — structured reports, evidence maps, summaries, annotated citations.</p></div></div>
+      <div class="wf-step"><div class="wf-num">04</div><div class="wf-body"><h4>Manual Verification</h4><p>The Verifier role reviews all outputs against source material using verification sheets before submission.</p></div></div>
+      <div class="wf-step"><div class="wf-num">05</div><div class="wf-body"><h4>Artifact Extraction</h4><p>Final outputs — structured report, evidence map, source summary, citation list — ready for Presenter to deliver.</p></div></div>
+    </div>
+
+    <div class="label">Group Setup<span class="rule"></span></div>
+    <div style="background:var(--bg-panel);border:1px solid var(--line);padding:22px;margin-bottom:28px;">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px;">Assign Roles (click to select)</p>
+      <div class="roles-wrap" id="roles">
+        <div class="role-chip" onclick="this.classList.toggle('on')">🔍 Source Curator</div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">💬 Prompt Lead</div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">✅ Verifier</div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">🔀 Synthesizer</div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">📊 Presenter</div>
+      </div>
+      <div style="height:1px;background:var(--line);margin:18px 0;"></div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;">
+        Curate Sources <span id="src-count" style="color:var(--text-dim)">(0 / 12)</span>
+      </p>
+      <div class="src-row">
+        <input class="src-inp" id="src-inp" placeholder="Paste URL or paper title..." onkeydown="if(event.key==='Enter')addSrc()">
+        <button class="src-add" onclick="addSrc()">+ Add</button>
+      </div>
+      <div class="src-list" id="src-list">
+        <div class="src-empty">// No sources added yet — minimum 5 to enable synthesis</div>
+      </div>
+      <button class="gen-btn" id="gen-btn" onclick="doGen()" disabled>
+        ▶ GENERATE WITH NOTEBOOKLM ENGINE
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ MODULE 3 ══ -->
+  <section class="screen" id="module3">
+    <div class="hero">
+      <span class="status-pill live">Live</span>
+      <p class="path">root/<span>module_03</span>/hermes-bot</p>
+      <h1>Module 3 — Hermes Bot (Telegram)<span class="cursor"></span></h1>
+      <p>Students interact in real time with Hermes — an AI tutor on Telegram, sandboxed to the subject syllabus via a guardrail engine. Guided roleplay, conceptual diagnostics, and real-time application questions keep every conversation within scope.</p>
+    </div>
+    <div class="meta">
+      <span class="meta-chip">STATUS: FUNCTIONAL</span>
+      <span class="meta-chip">PLATFORM: TELEGRAM</span>
+      <span class="meta-chip">TIER 2 — AI ENGINE LAYER</span>
+    </div>
+
+    <div class="label">Live Demo (Mockup)<span class="rule"></span></div>
+    <div class="chat-wrap">
+      <div class="chat-hdr">
+        <div class="chat-hdr-left">
+          <div class="bot-av">🪬</div>
+          <div>
+            <div class="bot-name">Hermes Bot</div>
+            <div class="bot-stat"><span class="stat-dot"></span>Online · Syllabus sandboxed</div>
+          </div>
+        </div>
+        <a class="tg-btn" href="https://t.me/HermesBotPlaceholder" target="_blank">📨 Open in Telegram</a>
+      </div>
+      <div class="chat-subj-tabs">
+        <button class="cst active" onclick="switchChat('wba',this)">WBA Dev</button>
+        <button class="cst" onclick="switchChat('oop',this)">OOP</button>
+        <button class="cst" onclick="switchChat('ir',this)">Info Retrieval</button>
+        <button class="cst" onclick="switchChat('os',this)">OS</button>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-sugg" id="chat-sugg"></div>
+      <div class="chat-inp-row">
+        <input class="chat-inp" id="chat-inp" placeholder="Ask Hermes..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="chat-send" onclick="sendMsg()">Send ↑</button>
+      </div>
+    </div>
+    <div class="cards" style="margin-top:4px;">
+      <div class="card"><h4>Syllabus-sandboxed</h4><p>Guardrail engine prevents Hermes from answering outside the approved subject scope — students stay on topic.</p></div>
+      <div class="card"><h4>Roleplay mode</h4><p>Hermes can simulate system scenarios (e.g. a compromised server, a deadlocked process) for diagnostic practice.</p></div>
+      <div class="card"><h4>Telemetry logging</h4><p>Every interaction is anonymously logged to the Central Data Aggregator, feeding the Module 4 dashboard.</p></div>
+    </div>
+  </section>
+
+  <!-- ══ MODULE 4 ══ -->
+  <section class="screen" id="module4">
+    <div class="hero">
+      <span class="status-pill pending">Preview</span>
+      <p class="path">root/<span>module_04</span>/analytics-dashboard</p>
+      <h1>Module 4 — Analytics Dashboard<span class="cursor"></span></h1>
+      <p>Real-time metrics surface where students experience the highest cognitive friction — Conceptual Friction Index (CFI), Time-to-Resolution (TTR), and Syllabus Heatmap — so instructors can intervene with targeted support before confusion becomes failure.</p>
+    </div>
+    <div class="meta">
+      <span class="meta-chip">STATUS: PREVIEW</span>
+      <span class="meta-chip">METRICS: CFI · TTR · HEATMAP</span>
+      <span class="meta-chip">TIER 3 — ANALYTICS LAYER</span>
+    </div>
+
+    <div class="label">Subject<span class="rule"></span></div>
+    <div class="hm-subj-tabs" id="m4-tabs">
+      <button class="hmst active" onclick="switchM4('wba',this)">SUBJ.01 WBA Dev</button>
+      <button class="hmst" onclick="switchM4('oop',this)">SUBJ.02 OOP</button>
+      <button class="hmst" onclick="switchM4('ir',this)">SUBJ.03 Info Retrieval</button>
+      <button class="hmst" onclick="switchM4('os',this)">SUBJ.04 OS</button>
+    </div>
+
+    <div class="label">Core Metrics<span class="rule"></span></div>
+    <div class="dash-metrics" id="dash-metrics"></div>
+
+    <div class="label">Syllabus Heatmap<span class="rule"></span></div>
+    <div class="heatmap-wrap">
+      <div class="heatmap-title">// Cognitive load by topic and week — <span id="hm-subj-label">Web Based Application Development</span></div>
+      <div id="heatmap-table"></div>
+      <div class="hm-legend">
+        <span>Low friction</span>
+        <div class="hm-legend-swatch">
+          <div style="background:rgba(82,214,138,.35)"></div>
+          <div style="background:rgba(82,214,138,.6)"></div>
+          <div style="background:rgba(255,180,84,.55)"></div>
+          <div style="background:rgba(252,129,129,.7)"></div>
+          <div style="background:rgba(252,129,129,.95)"></div>
+        </div>
+        <span>High friction</span>
+      </div>
+    </div>
+
+    <div class="label">Recommended Actions<span class="rule"></span></div>
+    <div class="actions-list">
+      <div class="act-row">
+        <span class="act-badge high">High CFI</span>
+        <div class="act-body"><h4>Re-teach with alternate visual framework</h4><p>Topics with CFI above 0.75 should be revisited using a different explanation approach or a new Module 1 simulation to address the specific confusion point.</p></div>
+      </div>
+      <div class="act-row">
+        <span class="act-badge med">High TTR</span>
+        <div class="act-body"><h4>Deploy Hermes diagnostic prompt via Telegram</h4><p>When TTR exceeds 15 minutes, trigger Hermes to surface the most common failure paths and guide students through structured diagnosis steps.</p></div>
+      </div>
+      <div class="act-row">
+        <span class="act-badge low">Heatmap spike</span>
+        <div class="act-body"><h4>Rebalance topic sequence and insert bridging material</h4><p>Weeks with consistent high friction across multiple topics indicate a curriculum sequencing issue — reorder or add bridging material before the next cycle.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>visualize_ai — UMT · RICH SOFTAM 2026</span>
+    <span id="foot-state">home · v1.0</span>
+  </footer>
+</div>
+
+<script>
+// ── NAV ──
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target=tab.dataset.target;
+    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===target));
+    document.getElementById('foot-state').textContent=target+' · v1.0';
+  });
+});
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString();}
+tick();setInterval(tick,1000);
+
+// ── MODULE 2: sources ──
+const sources=[];
+function addSrc(){
+  const inp=document.getElementById('src-inp');
+  const v=inp.value.trim();if(!v)return;
+  if(sources.length>=12){alert('Maximum 12 sources.');return;}
+  sources.push(v);inp.value='';updateSrcUI();
+}
+function rmSrc(i){sources.splice(i,1);updateSrcUI();}
+function updateSrcUI(){
+  const n=sources.length;
+  document.getElementById('src-count').textContent=`(${n} / 12)`;
+  document.getElementById('src-count').style.color=n>=5?'var(--cyan)':'var(--text-dim)';
+  const list=document.getElementById('src-list');
+  list.innerHTML=n?sources.map((s,i)=>`<div class="src-item"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100% - 36px)">${i+1}. ${s}</span><button class="src-rm" onclick="rmSrc(${i})">×</button></div>`).join(''):
+    '<div class="src-empty">// No sources added yet — minimum 5 to enable synthesis</div>';
+  document.getElementById('gen-btn').disabled=n<5;
+}
+function doGen(){
+  const b=document.getElementById('gen-btn');
+  b.textContent='// SYNTHESIZING...';b.disabled=true;
+  setTimeout(()=>{b.textContent='✓ ARTIFACTS GENERATED — OPEN NOTEBOOKLM';b.style.borderColor='var(--green)';b.style.color='var(--green)';b.style.background='var(--green-dim)';},2000);
+}
+
+// ── MODULE 3: chat ──
+const chatData={
+  wba:{greeting:"Init sequence complete. I'm Hermes — your AI tutor for Web Based Application Development. Ask me about HTTP, client-server architecture, REST APIs, sessions, or anything from your syllabus.",
+    suggested:['How does HTTP GET differ from POST?','Explain client-server architecture','What is session vs cookie?']},
+  oop:{greeting:"System online. I'm Hermes — OOP tutor. Inheritance trees, polymorphic dispatch, encapsulation, design patterns — what do you need to understand?",
+    suggested:['Difference: abstract class vs interface?','Explain polymorphism with example','What are SOLID principles?']},
+  ir:{greeting:"Hermes active — Information Retrieval module loaded. Let's explore web crawling, TF-IDF, precision-recall. What's unclear?",
+    suggested:['How does a search engine index pages?','What is TF-IDF?','Explain precision vs recall']},
+  os:{greeting:"Hermes online — OS module engaged. Scheduling algorithms, memory management, deadlock, virtual memory — ask away.",
+    suggested:['Explain round-robin scheduling','What causes a deadlock?','How does virtual memory work?']}
+};
+const chatHist={wba:[],oop:[],ir:[],os:[]};
+let curChat='wba';
+function switchChat(id,btn){
+  curChat=id;
+  document.querySelectorAll('.cst').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderChat(id);
+}
+function renderChat(id){
+  const d=chatData[id];
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML=`<div class="msg bot"><div class="msg-av">🪬</div><div class="bubble">${d.greeting}</div></div>`+
+    chatHist[id].map(m=>`<div class="msg ${m.r}"><div class="msg-av">${m.r==='bot'?'🪬':'〉'}</div><div class="bubble">${m.t}</div></div>`).join('');
+  msgs.scrollTop=msgs.scrollHeight;
+  document.getElementById('chat-sugg').innerHTML=d.suggested.map(q=>`<button class="sugg" onclick="sendSugg('${q.replace(/'/g,"\\'")}',this)">${q}</button>`).join('');
+  document.getElementById('chat-inp').placeholder=`Ask Hermes about ${id.toUpperCase()}...`;
+}
+function sendSugg(q,btn){btn.style.opacity='0.4';btn.disabled=true;document.getElementById('chat-inp').value=q;sendMsg();}
+function sendMsg(){
+  const inp=document.getElementById('chat-inp');
+  const msgs=document.getElementById('chat-msgs');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';
+  chatHist[curChat].push({r:'user',t:text});
+  const um=document.createElement('div');um.className='msg user';
+  um.innerHTML=`<div class="msg-av">〉</div><div class="bubble">${text}</div>`;
+  msgs.appendChild(um);
+  const tp=document.createElement('div');tp.className='msg bot';
+  tp.innerHTML=`<div class="msg-av">🪬</div><div class="bubble"><div class="typing-wrap"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(tp);msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    tp.remove();
+    const reply=`// MOCKUP MODE — Hermes Bot is live on Telegram. <a href="https://t.me/HermesBotPlaceholder" target="_blank" style="color:var(--cyan)">Open Hermes on Telegram →</a> to get real AI tutoring sandboxed to your syllabus. <span style="color:var(--text-faint)">[query logged: "${text}"]</span>`;
+    const bm=document.createElement('div');bm.className='msg bot';
+    bm.innerHTML=`<div class="msg-av">🪬</div><div class="bubble">${reply}</div>`;
+    chatHist[curChat].push({r:'bot',t:reply});
+    msgs.appendChild(bm);msgs.scrollTop=msgs.scrollHeight;
+  },1400);
+}
+
+// ── MODULE 4: dashboard ──
+const M4={
+  wba:{label:'Web Based Application Development',cfi:0.82,ttr:18.4,eff:100,
+    topics:['Client-Server','HTTP Methods','Session Mgmt','REST APIs','Frontend JS'],
+    heat:[[0.9,0.7,0.5,0.8,0.6,0.7],[0.6,0.8,0.9,0.4,0.5,0.6],[0.3,0.5,0.7,0.9,0.6,0.4],[0.5,0.6,0.8,0.7,0.9,0.5],[0.7,0.4,0.5,0.6,0.8,0.9]]},
+  oop:{label:'Object Oriented Programming',cfi:0.74,ttr:15.2,eff:100,
+    topics:['Inheritance','Polymorphism','Encapsulation','Abstraction','Design Patterns'],
+    heat:[[0.5,0.7,0.8,0.6,0.9,0.7],[0.7,0.9,0.6,0.8,0.5,0.6],[0.4,0.5,0.6,0.7,0.8,0.9],[0.6,0.4,0.7,0.5,0.6,0.8],[0.8,0.6,0.5,0.9,0.7,0.4]]},
+  ir:{label:'Information Retrieval',cfi:0.65,ttr:12.8,eff:100,
+    topics:['Crawling','Indexing','TF-IDF','Precision/Recall','Ranking'],
+    heat:[[0.6,0.8,0.9,0.5,0.7,0.8],[0.4,0.6,0.7,0.9,0.8,0.5],[0.8,0.5,0.4,0.6,0.9,0.7],[0.5,0.7,0.8,0.4,0.6,0.9],[0.7,0.9,0.6,0.8,0.5,0.4]]},
+  os:{label:'Operating System',cfi:0.78,ttr:16.9,eff:100,
+    topics:['Scheduling','Memory Mgmt','Deadlock','File System','Virtualisation'],
+    heat:[[0.8,0.9,0.7,0.6,0.8,0.5],[0.5,0.6,0.9,0.8,0.7,0.6],[0.9,0.7,0.6,0.5,0.9,0.8],[0.6,0.5,0.8,0.9,0.6,0.7],[0.7,0.8,0.5,0.7,0.5,0.9]]}
+};
+function heatCol(v){
+  if(v>0.75)return`rgba(252,129,129,${.4+v*.55})`;
+  if(v>0.5)return`rgba(255,180,84,${.35+v*.5})`;
+  return`rgba(82,214,138,${.25+v*.5})`;
+}
+function switchM4(id,btn){
+  document.querySelectorAll('#m4-tabs .hmst').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderM4(id);
+}
+function renderM4(id){
+  const d=M4[id];
+  document.getElementById('hm-subj-label').textContent=d.label;
+  const cfiCol=d.cfi>0.7?'var(--amber)':d.cfi>0.5?'var(--cyan)':'var(--green)';
+  const ttrCol=d.ttr>15?'var(--amber)':'var(--green)';
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric">
+      <div class="metric-lbl">Conceptual Friction Index</div>
+      <div class="metric-val" style="color:${cfiCol}">${d.cfi.toFixed(2)}</div>
+      <div class="metric-desc">${d.cfi>0.7?'HIGH — review concepts, add visual scaffolds':d.cfi>0.5?'MEDIUM — targeted hints recommended':'LOW — students coping well'}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(d.cfi*100)}%;background:${cfiCol}"></div></div>
+    </div>
+    <div class="metric">
+      <div class="metric-lbl">Time to Resolution (avg)</div>
+      <div class="metric-val" style="color:${ttrCol}">${d.ttr}<span style="font-size:16px;font-weight:400"> min</span></div>
+      <div class="metric-desc">${d.ttr>15?'MEDIUM — suggest diagnostic paths':'LOW — resolving quickly'}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round((d.ttr/30)*100)}%;background:${ttrCol}"></div></div>
+    </div>
+    <div class="metric">
+      <div class="metric-lbl">Student Effectiveness</div>
+      <div class="metric-val" style="color:var(--green)">${d.eff}%</div>
+      <div class="metric-desc">70% substantial · 30% moderate · 0% no help</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${d.eff}%;background:var(--green)"></div></div>
+    </div>`;
+  const weeks=['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6'];
+  let tbl=`<table class="hm-table"><thead><tr><th></th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  d.topics.forEach((t,ti)=>{
+    tbl+=`<tr><td class="hm-topic">${t}</td>${d.heat[ti].map(v=>`<td class="hm-cell" style="background:${heatCol(v)}"></td>`).join('')}</tr>`;
+  });
+  tbl+='</tbody></table>';
+  document.getElementById('heatmap-table').innerHTML=tbl;
+}
+
+// ── INIT ──
+renderChat('wba');
+renderM4('wba');
+</script>
+</body>
+</html>
