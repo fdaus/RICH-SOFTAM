@@ -274,46 +274,251 @@
   }
   .chat-send:hover{background:rgba(79,227,193,.25);}
 
-  /* ── MODULE 4: dashboard ── */
-  .dash-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
-  .metric{background:var(--bg-panel);border:1px solid var(--line);padding:18px;}
-  .metric-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;}
-  .metric-val{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:800;margin-bottom:4px;}
-  .metric-desc{font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.4;}
-  .bar-bg{height:3px;background:var(--line);}
-  .bar-fill{height:100%;transition:width 1.2s ease;}
-  .heatmap-wrap{background:var(--bg-panel);border:1px solid var(--line);padding:20px;margin-bottom:20px;}
-  .heatmap-title{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;}
-  .hm-subj-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-  .hmst{
-    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
-    padding:5px 10px;border:1px solid var(--line);background:var(--bg);color:var(--text-faint);
-    cursor:pointer;transition:all .15s;
-  }
-  .hmst:hover{color:var(--text);border-color:var(--line);}
-  .hmst.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim);}
-  table.hm-table{width:100%;border-collapse:separate;border-spacing:3px;}
-  table.hm-table th{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);text-align:center;padding:2px 4px;font-weight:500;}
-  table.hm-table td.hm-topic{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-dim);padding-right:12px;white-space:nowrap;}
-  table.hm-table td.hm-cell{height:24px;min-width:40px;border-radius:2px;}
-  .hm-legend{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);}
+  /* ── MODULE 4: SCDLAF analytics dashboard ── */
   .hm-legend-swatch{display:flex;gap:3px;}
   .hm-legend-swatch div{width:18px;height:8px;border-radius:1px;}
-  .actions-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);}
-  .act-row{
-    display:flex;align-items:flex-start;gap:14px;padding:15px 18px;
-    border-bottom:1px solid var(--line);background:var(--bg-panel);
+
+  /* Sub-Navigation Tabs */
+  .subnav{
+    display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:24px;
   }
-  .act-row:last-child{border-bottom:none;}
-  .act-badge{
-    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
-    font-weight:700;padding:4px 9px;border-radius:2px;white-space:nowrap;flex-shrink:0;margin-top:2px;
+  .subnav-tab{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+    padding:8px 14px;background:transparent;border:1px solid transparent;color:var(--text-faint);
+    cursor:pointer;font-weight:600;transition:all .15s;
   }
-  .act-badge.high{color:var(--amber);border:1px solid var(--amber);background:var(--amber-dim);}
-  .act-badge.med{color:var(--cyan);border:1px solid var(--cyan);background:var(--cyan-dim);}
-  .act-badge.low{color:var(--green);border:1px solid var(--green);background:var(--green-dim);}
-  .act-body h4{font-size:13.5px;font-weight:600;color:var(--text);margin:0 0 4px;}
-  .act-body p{font-size:12.5px;color:var(--text-dim);line-height:1.5;margin:0;}
+  .subnav-tab:hover{color:var(--text);}
+  .subnav-tab.active{border-color:var(--line);background:var(--bg-panel);color:var(--cyan);border-bottom-color:var(--cyan);}
+
+  /* Upload Grid */
+  .upload-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:24px;
+  }
+  .up-box{
+    border:1px dashed var(--line);background:var(--bg-panel);padding:20px;text-align:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:140px;position:relative;cursor:pointer;transition:border-color .15s, background .15s;
+  }
+  .up-box:hover{border-color:var(--cyan);background:var(--bg-raised);}
+  .up-box.uploaded{border-style:solid;border-color:var(--green);background:rgba(82,214,138,.03);}
+  .up-icon{font-size:24px;margin-bottom:8px;}
+  .up-title{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;margin-bottom:4px;color:var(--text);}
+  .up-desc{font-size:11px;color:var(--text-dim);line-height:1.4;}
+  .up-status{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;margin-top:10px;padding:2px 6px;border-radius:2px;}
+  .up-status.empty{color:var(--text-faint);border:1px solid var(--line);}
+  .up-status.loaded{color:var(--green);border:1px solid var(--green);background:var(--green-dim);}
+
+  /* Preset Banner */
+  .preset-banner{
+    border:1px solid var(--line);background:var(--cyan-dim);border-left:3px solid var(--cyan);
+    padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:14px;
+  }
+  .preset-text h4{margin:0 0 4px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);}
+  .preset-text p{margin:0;font-size:12px;color:var(--text-dim);}
+  .preset-btn{
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;
+    padding:8px 14px;background:var(--cyan);border:none;color:var(--bg);cursor:pointer;
+    transition:transform .15s, opacity .15s;
+  }
+  .preset-btn:hover{transform:translateY(-1px);opacity:0.95;}
+
+  /* Pipeline Verify Panel */
+  .pipe-panel{
+    border:1px solid var(--line);background:var(--bg-panel);padding:24px;margin-bottom:24px;
+    text-align: center;
+  }
+  .pipe-title{
+    font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .pipe-title .led-small{
+    width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);
+  }
+  .pipe-title .led-small.active{
+    background:var(--green);box-shadow:0 0 6px var(--green);
+  }
+  .pipe-status{font-size:13.5px;line-height:1.6;color:var(--text-dim);margin-bottom:18px;}
+  .pipe-status span.highlight{color:var(--cyan);font-weight:600;}
+
+  /* Observe Button */
+  .observe-btn{
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    padding:12px 28px;background:var(--cyan);color:var(--bg);border:none;cursor:pointer;
+    box-shadow:0 0 15px rgba(79,227,193,0.3);transition:all .15s;
+  }
+  .observe-btn:hover:not(:disabled){transform:scale(1.02);box-shadow:0 0 20px rgba(79,227,193,0.5);}
+  .observe-btn:disabled{
+    background:var(--line);color:var(--text-faint);box-shadow:none;cursor:not-allowed;
+  }
+
+  /* Dashboard Block Layout */
+  .dash-layout{
+    display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;
+  }
+  @media(max-width:850px){
+    .dash-layout{grid-template-columns:1fr;}
+  }
+  .dash-block{
+    border:1px solid var(--line);background:var(--bg-panel);padding:20px;
+    display:flex;flex-direction:column;
+  }
+  .block-title{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:10px;
+  }
+
+  /* Interactive SVG Styles */
+  .svg-container{width:100%;background:var(--bg);border:1px solid var(--line);padding:10px;position:relative;}
+  .svg-chart{display:block;width:100%;height:auto;}
+  .svg-legend{display:flex;gap:12px;justify-content:center;margin-top:10px;}
+  .leg-item{
+    display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);
+  }
+  .leg-color{width:12px;height:4px;border-radius:1px;}
+
+  /* Heatmap Grid */
+  .grid-heatmap{
+    display:grid;grid-template-columns:110px 1fr;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  }
+  .hm-row-lbl{display:flex;align-items:center;color:var(--text-dim);}
+  .hm-grid-cells{
+    display:grid;grid-template-columns:repeat(8,1fr);gap:4px;
+  }
+  .hm-cell-tile{
+    aspect-ratio:2;border-radius:2px;display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.9);
+  }
+  .hm-hdr{
+    display:grid;grid-template-columns:110px 1fr;gap:10px;margin-bottom:6px;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text-faint);
+  }
+
+  /* Dropdown Selectors */
+  .student-sel-row{
+    display:flex;align-items:center;gap:14px;margin-bottom:20px;background:var(--bg-raised);padding:12px 18px;border:1px solid var(--line);
+  }
+  .st-label{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--text-dim);}
+  .st-dropdown{
+    background:var(--bg);border:1px solid var(--line);color:var(--text);padding:8px 14px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;cursor:pointer;
+  }
+  .st-dropdown:focus{border-color:var(--cyan);}
+
+  /* Radar & Profile details */
+  .diag-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:20px;}
+  @media(max-width:800px){.diag-grid{grid-template-columns:1fr;}}
+
+  /* Recommendations block */
+  .rec-box{
+    border:1px dashed var(--line);background:rgba(255,180,84,.02);padding:18px;margin-top:18px;
+    border-left:3px solid var(--amber);
+  }
+  .rec-title{
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;display:flex;align-items:center;gap:8px;
+  }
+  .rec-text{font-size:13px;line-height:1.55;color:var(--text-dim);}
+
+  /* Custom Lesson Plan Table styles */
+  .lp-editor-card{
+    background:var(--bg-panel);border:1px solid var(--line);padding:20px;margin-bottom:24px;
+  }
+  .lp-table{
+    width:100%;border-collapse:collapse;margin-top:14px;font-size:12px;
+  }
+  .lp-table th{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;text-align:left;color:var(--text-faint);padding:10px 8px;border-bottom:1px solid var(--line);
+  }
+  .lp-table td{
+    padding:8px;border-bottom:1px solid var(--line);
+  }
+  .lp-input{
+    background:var(--bg);border:1px solid var(--line);color:var(--text);padding:6px 10px;
+    font-family:inherit;font-size:11.5px;width:100%;outline:none;transition:border-color .15s;
+  }
+  .lp-input:focus{border-color:var(--cyan);}
+  .lp-input-center{text-align:center;}
+  .btn-group{
+    display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;
+  }
+  .action-btn{
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:8px 14px;
+    cursor:pointer;border:1px solid var(--line);background:var(--bg-panel);color:var(--text-dim);
+    transition:all .15s;
+  }
+  .action-btn:hover{color:var(--text);border-color:var(--cyan);}
+  .action-btn.primary{
+    background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan);font-weight:700;
+  }
+  .action-btn.primary:hover{background:rgba(79,227,193,.25);}
+  .action-btn.danger{
+    color:var(--red);border-color:var(--red);background:var(--red-dim);
+  }
+  .action-btn.danger:hover{background:rgba(252,129,129,.25);}
+
+  /* Manual Metadata Form */
+  .meta-form-card {
+    background:var(--bg-panel);border:1px solid var(--line);padding:20px;margin-bottom:24px;
+  }
+  .meta-form-grid {
+    display:grid;grid-template-columns:1fr 1fr 120px;gap:12px;margin-bottom:14px;
+  }
+  @media(max-width: 600px){
+    .meta-form-grid { grid-template-columns:1fr; }
+  }
+
+  .file-input-hidden {
+    display: none;
+  }
+
+  /* Intervention form styles */
+  .int-type-tabs {
+    display: flex; gap: 8px; margin-bottom: 14px;
+  }
+  .int-tab-btn {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 12px;
+    background: var(--bg); border: 1px solid var(--line); color: var(--text-faint);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .int-tab-btn.active {
+    border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim);
+  }
+  .intervention-form {
+    display: flex; flex-direction: column; gap: 12px; background: var(--bg-raised);
+    padding: 16px; border: 1px solid var(--line); margin-bottom: 20px;
+  }
+  .int-textarea {
+    background: var(--bg); border: 1px solid var(--line); color: var(--text);
+    padding: 10px; font-family: inherit; font-size: 12.5px; height: 70px; resize: none;
+    outline: none; transition: border-color 0.15s;
+  }
+  .int-textarea:focus { border-color: var(--cyan); }
+  .int-log-table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  .int-log-table th {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-align: left;
+    color: var(--text-faint); padding: 8px; border-bottom: 1px solid var(--line);
+  }
+  .int-log-table td {
+    padding: 10px 8px; border-bottom: 1px solid var(--line); color: var(--text-dim);
+  }
+
+  /* Toast notification */
+  #m4-toast-box {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    background: var(--bg-raised);
+    border: 1px solid var(--cyan);
+    padding: 14px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    display: none;
+    animation: fade .2s ease;
+  }
 
   footer{
     margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
@@ -325,7 +530,6 @@
     .idx-num{display:none;}
     .status-pill{position:static;display:inline-block;margin-bottom:14px;}
     nav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
-    .dash-metrics{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -342,7 +546,7 @@
     <button class="tab" data-target="module1"><span class="idx">01</span> Module 1 <span class="led ready"></span></button>
     <button class="tab" data-target="module2"><span class="idx">02</span> Module 2 <span class="led pending"></span></button>
     <button class="tab" data-target="module3"><span class="idx">03</span> Module 3 <span class="led ready"></span></button>
-    <button class="tab" data-target="module4"><span class="idx">04</span> Module 4 <span class="led pending"></span></button>
+    <button class="tab" data-target="module4"><span class="idx">04</span> Module 4 <span class="led ready"></span></button>
   </nav>
 
   <!-- ══ HOME ══ -->
@@ -410,7 +614,7 @@
           <h3>Module 4 — Cognitive Load Analytics Dashboard</h3>
           <p>Real-time metrics — CFI, TTR, Syllabus Heatmap — tell instructors exactly where students struggle so targeted support can happen before it is too late.</p>
         </div>
-        <span class="badge pending">Preview</span>
+        <span class="badge ready">Live</span>
       </li>
     </ul>
 
@@ -632,60 +836,359 @@
   <!-- ══ MODULE 4 ══ -->
   <section class="screen" id="module4">
     <div class="hero">
-      <span class="status-pill pending">Preview</span>
-      <p class="path">root/<span>module_04</span>/analytics-dashboard</p>
-      <h1>Module 4 — Analytics Dashboard<span class="cursor"></span></h1>
-      <p>Real-time metrics surface where students experience the highest cognitive friction — Conceptual Friction Index (CFI), Time-to-Resolution (TTR), and Syllabus Heatmap — so instructors can intervene with targeted support before confusion becomes failure.</p>
-    </div>
-    <div class="meta">
-      <span class="meta-chip">STATUS: PREVIEW</span>
-      <span class="meta-chip">METRICS: CFI · TTR · HEATMAP</span>
-      <span class="meta-chip">TIER 3 — ANALYTICS LAYER</span>
+      <span class="status-pill pending" id="m4-main-status">Awaiting Setup</span>
+      <p class="path">root/<span>core_analytics</span>/scdlaf-analytics</p>
+      <h1>Cognitive Load &amp; Competency Analytics<span class="cursor"></span></h1>
+      <p>Cohort and individual diagnostic analysis based on a generic 4-document constructive alignment pipeline. Customize the lesson plan according to your course requirements to automatically map current competency gaps.</p>
     </div>
 
-    <div class="label">Subject<span class="rule"></span></div>
-    <div class="hm-subj-tabs" id="m4-tabs">
-      <button class="hmst active" onclick="switchM4('wba',this)">SUBJ.01 WBA Dev</button>
-      <button class="hmst" onclick="switchM4('oop',this)">SUBJ.02 OOP</button>
-      <button class="hmst" onclick="switchM4('ir',this)">SUBJ.03 Info Retrieval</button>
-      <button class="hmst" onclick="switchM4('os',this)">SUBJ.04 OS</button>
+    <!-- Sub-navigation tabs -->
+    <div class="subnav">
+      <button class="subnav-tab active" id="stab-pipeline" onclick="switchSubTab('pipeline')">⚙️ Course Configuration (Setup)</button>
+      <button class="subnav-tab" id="stab-cohort" onclick="switchSubTab('cohort')">👨‍🏫 Cohort Analytics &amp; Interventions (Lecturer)</button>
+      <button class="subnav-tab" id="stab-student" onclick="switchSubTab('student')">🎓 Individual Profile (Student)</button>
     </div>
 
-    <div class="label">Core Metrics<span class="rule"></span></div>
-    <div class="dash-metrics" id="dash-metrics"></div>
-
-    <div class="label">Syllabus Heatmap<span class="rule"></span></div>
-    <div class="heatmap-wrap">
-      <div class="heatmap-title">// Cognitive load by topic and week — <span id="hm-subj-label">Web Based Application Development</span></div>
-      <div id="heatmap-table"></div>
-      <div class="hm-legend">
-        <span>Low friction</span>
-        <div class="hm-legend-swatch">
-          <div style="background:rgba(82,214,138,.35)"></div>
-          <div style="background:rgba(82,214,138,.6)"></div>
-          <div style="background:rgba(255,180,84,.55)"></div>
-          <div style="background:rgba(252,129,129,.7)"></div>
-          <div style="background:rgba(252,129,129,.95)"></div>
+    <!-- TAB 1: ⚙️ Course Setup & Document Pipeline -->
+    <div class="subscreen" id="subscreen-pipeline" style="display:block;">
+      
+      <!-- Preset Demo Banner -->
+      <div class="preset-banner">
+        <div class="preset-text">
+          <h4>⚡ Load Sample Course Template (Operating System CSF3213)</h4>
+          <p>Instantly populate the alignment engine with standard Syllabus, MyCA, draft lesson plans, and UMT student grades.</p>
         </div>
-        <span>High friction</span>
+        <button class="preset-btn" onclick="loadOSDemoPresets()">⚡ Load Course Presets</button>
+      </div>
+
+      <div class="label">4-Document Pipeline Workflow (File Uploads)<span class="rule"></span></div>
+      <div class="upload-grid">
+        <div class="up-box" id="upbox-syllabus" onclick="triggerFileInput('syllabus')">
+          <div class="up-icon">📄</div>
+          <div class="up-title">1. Course Syllabus (PDF)</div>
+          <div class="up-desc">Extract course information, code, and learning outcomes (CLO).</div>
+          <div class="up-status empty" id="upstatus-syllabus">Upload Syllabus PDF</div>
+          <input type="file" id="file-syllabus" class="file-input-hidden" accept="application/pdf" onchange="handlePDFUpload('syllabus', this)">
+        </div>
+        
+        <div class="up-box" id="upbox-myca" onclick="triggerFileInput('myca')">
+          <div class="up-icon">📋</div>
+          <div class="up-title">2. MyCA Document (PDF)</div>
+          <div class="up-desc">Map standard CLO/PLO, percentages, and learning domains.</div>
+          <div class="up-status empty" id="upstatus-myca">Upload MyCA PDF</div>
+          <input type="file" id="file-myca" class="file-input-hidden" accept="application/pdf" onchange="handlePDFUpload('myca', this)">
+        </div>
+        
+        <div class="up-box" id="upbox-grades" onclick="triggerFileInput('grades')">
+          <div class="up-icon">📊</div>
+          <div class="up-title">3. Student Grades (CSV)</div>
+          <div class="up-desc">Link assessment marks to students. Drag-and-drop or upload UMT grade sheet.</div>
+          <div class="up-status empty" id="upstatus-grades">Upload Student Grades CSV</div>
+          <input type="file" id="file-grades" class="file-input-hidden" accept=".csv" onchange="handleCSVUpload(this)">
+        </div>
+        
+        <div class="up-box" id="upbox-lesson" style="border-style: solid; border-color: var(--amber-dim);" onclick="scrollToEditor()">
+          <div class="up-icon" style="color: var(--amber)">📅</div>
+          <div class="up-title" style="color: var(--amber)">4. Lesson Plan Editor</div>
+          <div class="up-desc">Fill in and customize the interactive lesson table below.</div>
+          <div class="up-status empty" style="color: var(--amber); border-color: var(--amber-dim);" id="upstatus-lesson">See Template Below</div>
+        </div>
+      </div>
+
+      <!-- Course Metadata Verification Form -->
+      <div class="label">Course Configuration &amp; Learning Outcomes Verification<span class="rule"></span></div>
+      <div class="meta-form-card">
+        <p style="font-size: 13px; color: var(--text-dim); margin-top: 0; line-height: 1.55;">
+          Review the automatically extracted document metadata below. You may manually edit these fields to align descriptions across the analysis workspace.
+        </p>
+        <div class="meta-form-grid">
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); display:block; margin-bottom:6px;">Course Code</label>
+            <input class="lp-input" type="text" id="meta-course-code" value="CSF3213" onchange="updateCourseMetadata()">
+          </div>
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); display:block; margin-bottom:6px;">Course Name</label>
+            <input class="lp-input" type="text" id="meta-course-name" value="OPERATING SYSTEM" onchange="updateCourseMetadata()">
+          </div>
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); display:block; margin-bottom:6px;">Credits</label>
+            <input class="lp-input lp-input-center" type="number" id="meta-course-credits" value="3" onchange="updateCourseMetadata()">
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); display:block; margin-bottom:4px;">CLO1 Description</label>
+            <input class="lp-input" type="text" id="meta-clo1" value="Explain the main concepts and structures of operating systems and security issues (C2, PLO1)" onchange="updateCourseMetadata()">
+          </div>
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); display:block; margin-bottom:4px;">CLO2 Description</label>
+            <input class="lp-input" type="text" id="meta-clo2" value="Apply appropriate methods and algorithms in solving problems related to a given operating system. (C3, PLO2)" onchange="updateCourseMetadata()">
+          </div>
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); display:block; margin-bottom:4px;">CLO3 Description</label>
+            <input class="lp-input" type="text" id="meta-clo3" value="Demonstrate effective verbal and written communication skills in oral presentation and written report on operating system. (A3, PLO5)" onchange="updateCourseMetadata()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Lesson Plan Interactive Editor Card -->
+      <div class="label">Lesson Plan Customization Template &amp; Editor<span class="rule"></span></div>
+      <div class="lp-editor-card" id="lp-editor-section">
+        <p style="font-size: 13px; color: var(--text-dim); margin-top: 0; line-height: 1.55;">
+          Populate or modify the weekly lecture activities below. The assessments defined here will dynamically map to corresponding student grade columns.
+        </p>
+        
+        <div style="overflow-x: auto;">
+          <table class="lp-table" id="lp-interactive-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Week</th>
+                <th>Lecture Topic / Syllabus Content</th>
+                <th style="width: 140px;">Target CLO</th>
+                <th style="width: 160px;">Assessment Name</th>
+                <th style="width: 120px; text-align: center;">Target PLO</th>
+                <th style="width: 100px; text-align: right;">Weightage (%)</th>
+                <th style="width: 60px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="lp-table-body">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="btn-group">
+          <button class="action-btn" onclick="addNewLpRow()">➕ Add Week Row</button>
+          <button class="action-btn" onclick="resetToLpTemplate()">🔄 Reset to Standard Template</button>
+          <button class="action-btn" onclick="downloadLpCSV()">📥 Download Template CSV</button>
+          <button class="action-btn" style="border-color: var(--green); color: var(--green);" onclick="downloadSampleGradesCSV()">📊 Generate Student Grades CSV Template</button>
+          <button class="action-btn primary" onclick="applyLpChanges()">💾 Save &amp; Synchronize Lesson Plan</button>
+        </div>
+      </div>
+
+      <!-- Start Verifier & Observe button trigger -->
+      <div class="label">SCDLAF Constructive Alignment Engine Activation<span class="rule"></span></div>
+      <div class="pipe-panel">
+        <div class="pipe-title">
+          <span class="led-small" id="pipe-led"></span>
+          <span>Alignment Status: <span id="pipe-status-label">Awaiting Documents</span></span>
+        </div>
+        <div class="pipe-status" id="pipe-status-msg">
+          Insufficient documents loaded to map cohort performance. Upload required files, or click <strong>Presets</strong> above to load standard Operating System CSF3213 records.
+        </div>
+        <div>
+          <button class="observe-btn" id="observe-trigger-btn" onclick="triggerObservationProcess()" disabled>
+            🔍 Start Observation (Observe)
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="label">Recommended Actions<span class="rule"></span></div>
-    <div class="actions-list">
-      <div class="act-row">
-        <span class="act-badge high">High CFI</span>
-        <div class="act-body"><h4>Re-teach with alternate visual framework</h4><p>Topics with CFI above 0.75 should be revisited using a different explanation approach or a new Module 1 simulation to address the specific confusion point.</p></div>
+    <!-- TAB 2: 👨‍🏫 Cohort Analytics -->
+    <div class="subscreen" id="subscreen-cohort" style="display:none;">
+      <div class="dash-layout">
+        
+        <!-- Mastery curve line plot (SVG) -->
+        <div class="dash-block">
+          <div class="block-title">📈 Chronological CLO Mastery Curve (Cohort Average)</div>
+          <div class="svg-container" style="border:none;">
+            <svg class="svg-chart" viewBox="0 0 800 300" id="cohort-line-chart">
+              <line x1="50" y1="50" x2="750" y2="50" stroke="#232C36" stroke-dasharray="4" />
+              <line x1="50" y1="112.5" x2="750" y2="112.5" stroke="#232C36" stroke-dasharray="4" />
+              <line x1="50" y1="175" x2="750" y2="175" stroke="#232C36" stroke-dasharray="4" />
+              <line x1="50" y1="237.5" x2="750" y2="237.5" stroke="#232C36" stroke-dasharray="4" />
+              <line x1="50" y1="250" x2="750" y2="250" stroke="#4B5560" stroke-width="1.5" />
+              <!-- Threshold Line (65%) -->
+              <line x1="50" y1="150" x2="750" y2="150" stroke="#FC8181" stroke-dasharray="2" stroke-width="1.5" />
+              <text x="755" y="153" fill="#FC8181" font-size="10" font-family="JetBrains Mono">65% Competency Target</text>
+              
+              <g id="chart-lines-layer"></g>
+              <g id="chart-dots-layer"></g>
+              
+              <g fill="#7C8A99" font-size="9" font-family="JetBrains Mono" text-anchor="middle" id="chart-xaxis-labels">
+              </g>
+            </svg>
+            <div class="svg-legend" style="margin-top: 15px;">
+              <div class="leg-item"><div class="leg-color" style="background:var(--cyan)"></div>CLO1 (Knowledge)</div>
+              <div class="leg-item"><div class="leg-color" style="background:var(--purple)"></div>CLO2 (Algorithmic / Applied)</div>
+              <div class="leg-item"><div class="leg-color" style="background:var(--amber)"></div>CLO3 (Communication)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric stats -->
+        <div class="dash-block" style="justify-content: space-between;">
+          <div>
+            <div class="block-title">📊 Cohort Metrics Dashboard</div>
+            <div style="margin-bottom: 20px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px;">Cohort Size</div>
+              <div style="font-size: 28px; font-weight:800; color:var(--cyan);" id="cohort-size-metric">0</div>
+              <div style="font-size:12px; color:var(--text-dim);">Active student profiles aligned</div>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px;">Competency Achievement Rate</div>
+              <div style="font-size: 28px; font-weight:800; color:var(--green);" id="cohort-pass-metric">0%</div>
+              <div style="font-size:12px; color:var(--text-dim);">Average assessments score &ge; 65%</div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px;">Cognitive Friction Index (CFI)</div>
+              <div style="font-size: 28px; font-weight:800; color:var(--amber);" id="cohort-friction-metric">0.00</div>
+              <div style="font-size:12px; color:var(--text-dim);">Class conceptual hurdle index</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="act-row">
-        <span class="act-badge med">High TTR</span>
-        <div class="act-body"><h4>Deploy Hermes diagnostic prompt via Telegram</h4><p>When TTR exceeds 15 minutes, trigger Hermes to surface the most common failure paths and guide students through structured diagnosis steps.</p></div>
-      </div>
-      <div class="act-row">
-        <span class="act-badge low">Heatmap spike</span>
-        <div class="act-body"><h4>Rebalance topic sequence and insert bridging material</h4><p>Weeks with consistent high friction across multiple topics indicate a curriculum sequencing issue — reorder or add bridging material before the next cycle.</p></div>
+
+      <div class="dash-layout" style="grid-template-columns: 1fr 1.1fr;">
+        <!-- Heatmap block -->
+        <div class="dash-block">
+          <div class="block-title">🌡️ Syllabus Topic Competency Heatmap (Cohort Average %)</div>
+          <div class="hm-hdr" id="heatmap-header-row">
+            <div></div>
+            <div class="hm-grid-cells" style="text-align: center;" id="heatmap-header-labels">
+            </div>
+          </div>
+          <div class="grid-heatmap" id="cohort-heatmap-grid">
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top: 14px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint);">
+            <span>High Gap (&lt; 65%)</span>
+            <div class="hm-legend-swatch">
+              <div style="background:#5c2424"></div>
+              <div style="background:#70451a"></div>
+              <div style="background:#1c5c36"></div>
+            </div>
+            <span>Competency Met (&ge; 65%)</span>
+          </div>
+        </div>
+
+        <!-- Lecturer Intervention Panel -->
+        <div class="dash-block">
+          <div class="block-title">🛠️ Educational Intervention Planner</div>
+          <p style="font-size:12px; color:var(--text-dim); margin-top:0; margin-bottom:14px; line-height:1.5;">
+            Log proactive academic interventions to assist struggling student demographics or to address specific assessment failure points:
+          </p>
+          
+          <div class="intervention-form">
+            <div class="int-type-tabs">
+              <button class="int-tab-btn active" id="int-tab-student" onclick="setInterventionType('student')">Target Students</button>
+              <button class="int-tab-btn" id="int-tab-assessment" onclick="setInterventionType('assessment')">Target Assessment Component</button>
+            </div>
+
+            <!-- Dynamic Dropdowns based on active category -->
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <label id="int-select-label" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint);">Select Targeted Student Profile:</label>
+              <select class="st-dropdown" id="intervention-dropdown-target" style="width: 100%;">
+              </select>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint);">Targeted Support Plan &amp; Action Notes:</label>
+              <textarea class="int-textarea" id="intervention-text" placeholder="Enter custom support plan... (e.g., Conduct mini-tutorial sessions on CPU scheduling algorithms or written report revision criteria)"></textarea>
+            </div>
+
+            <button class="action-btn primary" onclick="submitInterventionAction()">💾 Save Intervention Record</button>
+          </div>
+
+          <!-- Active applied interventions logs table -->
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:8px;">📁 Active Intervention Records:</div>
+          <div style="overflow-y:auto; max-height:130px; border:1px solid var(--line); background:var(--bg);">
+            <table class="int-log-table">
+              <thead>
+                <tr>
+                  <th>Target</th>
+                  <th>Category</th>
+                  <th>Educational Action Plan</th>
+                </tr>
+              </thead>
+              <tbody id="intervention-log-body">
+                <tr>
+                  <td colspan="3" style="text-align:center; color:var(--text-faint); padding:15px;">No intervention records logged yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
+
+    <!-- TAB 3: 🎓 Individual Diagnostics -->
+    <div class="subscreen" id="subscreen-student" style="display:none;">
+      
+      <!-- Student Selector row -->
+      <div class="student-sel-row">
+        <span class="st-label">🎯 Select Student Profile for Diagnostics:</span>
+        <select class="st-dropdown" id="student-dropdown" onchange="loadStudentProfile(this.value)">
+        </select>
+      </div>
+
+      <div class="diag-grid">
+        <!-- SVG Radar chart and metrics -->
+        <div class="dash-block">
+          <div class="block-title">🕸️ Competency Radar Analysis (Constructive CLO &amp; PLO Alignment)</div>
+          <div class="svg-container" style="border:none; text-align:center;">
+            <svg class="svg-chart" viewBox="0 0 320 320" style="max-width:280px; margin:0 auto;" id="radar-chart">
+              <!-- Web structures -->
+              <circle cx="160" cy="160" r="120" stroke="#232C36" fill="none" />
+              <circle cx="160" cy="160" r="90" stroke="#232C36" fill="none" />
+              <circle cx="160" cy="160" r="60" stroke="#232C36" fill="none" />
+              <circle cx="160" cy="160" r="30" stroke="#232C36" fill="none" />
+              
+              <!-- Axes lines -->
+              <line x1="160" y1="40" x2="160" y2="280" stroke="#232C36" />
+              <line x1="56" y1="100" x2="264" y2="220" stroke="#232C36" />
+              <line x1="56" y1="220" x2="264" y2="100" stroke="#232C36" />
+
+              <g fill="#7C8A99" font-size="9" font-family="JetBrains Mono" text-anchor="middle">
+                <text x="160" y="32">CLO1 (PLO1)</text>
+                <text x="280" y="110" text-anchor="start">CLO2 (PLO2)</text>
+                <text x="280" y="225" text-anchor="start">CLO3 (PLO5)</text>
+                <text x="160" y="294">PLO1 (Theory)</text>
+                <text x="40" y="225" text-anchor="end">PLO2 (Applied)</text>
+                <text x="40" y="110" text-anchor="end">PLO5 (Comm)</text>
+              </g>
+
+              <!-- Polygons layer injected via JS -->
+              <g id="radar-polygons"></g>
+            </svg>
+            <div class="svg-legend" style="margin-top:14px;">
+              <div class="leg-item"><div class="leg-color" style="background:var(--cyan)"></div>Student Profile</div>
+              <div class="leg-item"><div class="leg-color" style="background:var(--text-faint)"></div>Cohort Average</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score progress list & recommendations -->
+        <div class="dash-block">
+          <div class="block-title">🩺 Individual Diagnostic Syllabus Performance</div>
+          <p style="font-size:12.5px; color:var(--text-dim); margin-top:0; line-height:1.5;">
+            Individual performance metrics tracked chronologically across customized syllabus items. Assessments falling below the 65% benchmark trigger red alerts.
+          </p>
+
+          <div style="background:var(--bg); border:1px solid var(--line); padding:16px; border-radius:2px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-family:'JetBrains Mono',monospace; margin-bottom:10px;">
+              <span>Student ID: <span id="diag-st-id" style="color:var(--cyan)">-</span></span>
+              <span>Current Mastery Average: <span id="diag-st-grade" style="color:var(--green)">-</span></span>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;" id="diag-score-bars">
+            </div>
+          </div>
+
+          <!-- Dynamic Suggestion Card based on current competency gaps -->
+          <div class="rec-box" id="student-rec-box">
+            <div class="rec-title">
+              <span>⚠️ Status Competency Diagnosis</span>
+            </div>
+            <div class="rec-text" id="student-rec-text">
+              Please click 'Observe' on the setup tab to view individual syllabus diagnostic suggestions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="m4-toast-box">Toast Notification</div>
   </section>
 
   <footer>
@@ -797,67 +1300,1036 @@ function buildHermesReply(mode,text){
   return `${flow[mode]} <span style="color:var(--text-faint)">[telemetry captured: command, hint usage, attempt path, resolution timing]</span>`;
 }
 
-// ── MODULE 4: dashboard ──
-const M4={
-  wba:{label:'Web Based Application Development',cfi:0.82,ttr:18.4,eff:100,
-    topics:['Client-Server','HTTP Methods','Session Mgmt','REST APIs','Frontend JS'],
-    heat:[[0.9,0.7,0.5,0.8,0.6,0.7],[0.6,0.8,0.9,0.4,0.5,0.6],[0.3,0.5,0.7,0.9,0.6,0.4],[0.5,0.6,0.8,0.7,0.9,0.5],[0.7,0.4,0.5,0.6,0.8,0.9]]},
-  oop:{label:'Object Oriented Programming',cfi:0.74,ttr:15.2,eff:100,
-    topics:['Inheritance','Polymorphism','Encapsulation','Abstraction','Design Patterns'],
-    heat:[[0.5,0.7,0.8,0.6,0.9,0.7],[0.7,0.9,0.6,0.8,0.5,0.6],[0.4,0.5,0.6,0.7,0.8,0.9],[0.6,0.4,0.7,0.5,0.6,0.8],[0.8,0.6,0.5,0.9,0.7,0.4]]},
-  ir:{label:'Information Retrieval',cfi:0.65,ttr:12.8,eff:100,
-    topics:['Crawling','Indexing','TF-IDF','Precision/Recall','Ranking'],
-    heat:[[0.6,0.8,0.9,0.5,0.7,0.8],[0.4,0.6,0.7,0.9,0.8,0.5],[0.8,0.5,0.4,0.6,0.9,0.7],[0.5,0.7,0.8,0.4,0.6,0.9],[0.7,0.9,0.6,0.8,0.5,0.4]]},
-  os:{label:'Operating System',cfi:0.78,ttr:16.9,eff:100,
-    topics:['Scheduling','Memory Mgmt','Deadlock','File System','Virtualisation'],
-    heat:[[0.8,0.9,0.7,0.6,0.8,0.5],[0.5,0.6,0.9,0.8,0.7,0.6],[0.9,0.7,0.6,0.5,0.9,0.8],[0.6,0.5,0.8,0.9,0.6,0.7],[0.7,0.8,0.5,0.7,0.5,0.9]]}
+// ── MODULE 4: SCDLAF analytics dashboard ──
+// ── MASTER GLOBAL STATES ──
+var uploadedSCDLAF = {
+  syllabus: false,
+  myca: false,
+  grades: false,
+  lesson: false
 };
-function heatCol(v){
-  if(v>0.75)return`rgba(252,129,129,${.4+v*.55})`;
-  if(v>0.5)return`rgba(255,180,84,${.35+v*.5})`;
-  return`rgba(82,214,138,${.25+v*.5})`;
+
+// MULTI-LEVEL STRUCTURED COHORT DATA PRESET
+var osCohortData = {
+  students: [
+    { id: "S75922", name: "MARYAM MUSFIRAH BINTI ARIFF HAZIZAN", scores: { "QUIZ": 78, "TEST 1": 75, "TEST 2": 60, "WRITTEN REPORT - COGNITIVE SKILL": 72.5, "WRITTEN REPORT - COMMUNICATION SKILL": 60, "PRESENTATION - COMMUNICATION SKILL": 74 } },
+    { id: "S78521", name: "MUHAMMAD AMIR HAZIQ BIN MOHD NOOR", scores: { "QUIZ": 63, "TEST 1": 90, "TEST 2": 50, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 80, "PRESENTATION - COMMUNICATION SKILL": 80 } },
+    { id: "S80221", name: "AHMAD SYAMIL BIN AHMAD ZAM ZAM", scores: { "QUIZ": 98, "TEST 1": 75, "TEST 2": 70, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 80, "PRESENTATION - COMMUNICATION SKILL": 80 } },
+    { id: "S80226", name: "MUHAMMAD AZMEER SYAFIQ BIN AHMAD", scores: { "QUIZ": 100, "TEST 1": 70, "TEST 2": 20, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 80, "PRESENTATION - COMMUNICATION SKILL": 76 } },
+    { id: "S80279", name: "SITI HADIJAH BINTI ESHAM", scores: { "QUIZ": 100, "TEST 1": 65, "TEST 2": 60, "WRITTEN REPORT - COGNITIVE SKILL": 80, "WRITTEN REPORT - COMMUNICATION SKILL": 56, "PRESENTATION - COMMUNICATION SKILL": 60 } },
+    { id: "S80330", name: "MITHRAN A/L BALAKRISHNAN", scores: { "QUIZ": 98, "TEST 1": 75, "TEST 2": 40, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 74, "PRESENTATION - COMMUNICATION SKILL": 60 } }
+  ],
+  baseAverages: {
+    clo1: [88.2, 85.5, 80.1, 87.2, 89.1, 85.0, 83.5, 84.2, 85.0],
+    clo2: [75.1, 62.2, 63.5, 71.4, 58.8, 77.2, 79.5, 68.4, 70.0],
+    clo3: [82.5, 80.0, 81.2, 83.5, 82.0, 78.4, 61.2, 80.1, 75.0]
+  }
+};
+
+var courseMetadata = {
+  code: "CSF3213",
+  name: "OPERATING SYSTEM",
+  credits: 3,
+  clo1: "Explain the main concepts and structures of operating systems and security issues (C2, PLO1)",
+  clo2: "Apply appropriate methods and algorithms in solving problems related to a given operating system. (C3, PLO2)",
+  clo3: "Demonstrate effective verbal and written communication skills in oral presentation and written report on operating system. (A3, PLO5)"
+};
+
+var currentLpData = [];
+var uploadedCohortStudents = [];
+var isObservationLive = false;
+var activeInterventionType = 'student'; 
+var interventionLogs = [];
+
+
+// Custom styled Toast Notifications
+function showToast(message, isSuccess = false) {
+  const box = document.getElementById('m4-toast-box');
+  box.textContent = message;
+  box.style.borderColor = isSuccess ? 'var(--green)' : 'var(--red)';
+  box.style.color = isSuccess ? 'var(--green)' : 'var(--red)';
+  box.style.display = 'block';
+  
+  setTimeout(() => {
+    box.style.display = 'none';
+  }, 4000);
 }
-function switchM4(id,btn){
-  document.querySelectorAll('#m4-tabs .hmst').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  renderM4(id);
-}
-function renderM4(id){
-  const d=M4[id];
-  document.getElementById('hm-subj-label').textContent=d.label;
-  const cfiCol=d.cfi>0.7?'var(--amber)':d.cfi>0.5?'var(--cyan)':'var(--green)';
-  const ttrCol=d.ttr>15?'var(--amber)':'var(--green)';
-  document.getElementById('dash-metrics').innerHTML=`
-    <div class="metric">
-      <div class="metric-lbl">Conceptual Friction Index</div>
-      <div class="metric-val" style="color:${cfiCol}">${d.cfi.toFixed(2)}</div>
-      <div class="metric-desc">${d.cfi>0.7?'HIGH — review concepts, add visual scaffolds':d.cfi>0.5?'MEDIUM — targeted hints recommended':'LOW — students coping well'}</div>
-      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(d.cfi*100)}%;background:${cfiCol}"></div></div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">Time to Resolution (avg)</div>
-      <div class="metric-val" style="color:${ttrCol}">${d.ttr}<span style="font-size:16px;font-weight:400"> min</span></div>
-      <div class="metric-desc">${d.ttr>15?'MEDIUM — suggest diagnostic paths':'LOW — resolving quickly'}</div>
-      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round((d.ttr/30)*100)}%;background:${ttrCol}"></div></div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">Student Effectiveness</div>
-      <div class="metric-val" style="color:var(--green)">${d.eff}%</div>
-      <div class="metric-desc">70% substantial · 30% moderate · 0% no help</div>
-      <div class="bar-bg"><div class="bar-fill" style="width:${d.eff}%;background:var(--green)"></div></div>
-    </div>`;
-  const weeks=['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6'];
-  let tbl=`<table class="hm-table"><thead><tr><th></th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  d.topics.forEach((t,ti)=>{
-    tbl+=`<tr><td class="hm-topic">${t}</td>${d.heat[ti].map(v=>`<td class="hm-cell" style="background:${heatCol(v)}"></td>`).join('')}</tr>`;
+
+// Sub-Tab Switcher with locked tabs enforcement
+function switchSubTab(tabId){
+  if(!isObservationLive && tabId !== 'pipeline') {
+    showToast("⚠️ Configuration pending. Please click the main 'Observe' button under setup first!", false);
+    return;
+  }
+  
+  document.querySelectorAll('.subnav-tab').forEach(btn => {
+    btn.classList.remove('active');
   });
-  tbl+='</tbody></table>';
-  document.getElementById('heatmap-table').innerHTML=tbl;
+  const tabBtn = document.getElementById('stab-' + tabId);
+  if(tabBtn) tabBtn.classList.add('active');
+
+  document.querySelectorAll('.subscreen').forEach(scr => {
+    scr.style.display = 'none';
+  });
+  const subScreen = document.getElementById('subscreen-' + tabId);
+  if(subScreen) subScreen.style.display = 'block';
 }
+
+function triggerFileInput(type) {
+  document.getElementById(`file-${type}`).click();
+}
+
+// Dynamic PDF structures simulation
+function handlePDFUpload(type, input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const upstatus = document.getElementById(`upstatus-${type}`);
+    const upbox = document.getElementById(`upbox-${type}`);
+    
+    upstatus.textContent = "Analyzing structure...";
+    upstatus.className = "up-status pending";
+    
+    setTimeout(() => {
+      uploadedSCDLAF[type] = true;
+      upstatus.textContent = file.name;
+      upstatus.className = "up-status loaded";
+      upbox.classList.add('uploaded');
+      
+      const nameUpper = file.name.toUpperCase();
+      let matchedCode = nameUpper.match(/[A-Z]{3}\d{4}/) || nameUpper.match(/[A-Z]{3}\d{3}/);
+      if (matchedCode) {
+        courseMetadata.code = matchedCode[0];
+        document.getElementById('meta-course-code').value = courseMetadata.code;
+        
+        let potentialName = file.name.replace(courseMetadata.code, '').replace(/\.pdf/i, '').replace(/_/g, ' ').replace(/-/g, ' ').trim();
+        if (potentialName.length > 5) {
+          courseMetadata.name = potentialName.toUpperCase();
+          document.getElementById('meta-course-name').value = courseMetadata.name;
+        }
+      }
+      
+      updateCourseMetadata();
+      checkPipelineStatus();
+      showToast(`✓ PDF metadata extracted dynamically from ${file.name}!`, true);
+    }, 1200);
+  }
+}
+
+// Actual real-world client-side CSV parser supporting nested UMT headers
+function handleCSVUpload(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const upstatus = document.getElementById('upstatus-grades');
+    const upbox = document.getElementById('upbox-grades');
+    
+    upstatus.textContent = "Parsing grade sheet...";
+    upstatus.className = "up-status pending";
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const text = e.target.result;
+        const parsed = parseStudentCSV(text);
+        if (parsed && parsed.length > 0) {
+          uploadedCohortStudents = parsed;
+          uploadedSCDLAF.grades = true;
+          
+          upstatus.textContent = `${file.name} (${parsed.length} students)`;
+          upstatus.className = 'up-status loaded';
+          upbox.classList.add('uploaded');
+          
+          checkPipelineStatus();
+          showToast(`✓ Aligned CSV loaded successfully! Aligned ${parsed.length} students.`, true);
+        } else {
+          showToast("❌ Unable to parse UMT format. Headers must contain Matric & Name keys.");
+          upstatus.textContent = "Invalid CSV structure";
+          upstatus.className = "up-status empty";
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("❌ An error occurred while reading the CSV file.");
+        upstatus.textContent = "Read Error";
+        upstatus.className = "up-status empty";
+      }
+    };
+    reader.readAsText(file);
+  }
+}
+
+function parseStudentCSV(csvText) {
+  const lines = csvText.split(/\r?\n/);
+  if (lines.length < 2) return null;
+  
+  let isUMT = false;
+  let matrikLineIdx = -1;
+  
+  // Detect structure from first 10 rows
+  for (let i = 0; i < Math.min(10, lines.length); i++) {
+    const upperLine = lines[i].toUpperCase();
+    if (upperLine.includes("NO MATRIK") || upperLine.includes("NAMA PELAJAR")) {
+      isUMT = true;
+      matrikLineIdx = i;
+      break;
+    }
+  }
+
+  if (isUMT) {
+    // --- UMT EMBEDDED STRUCTURED CSV ENGINE ---
+    const mainHeaders = splitCSVRow(lines[matrikLineIdx]).map(h => h.trim().toUpperCase());
+    const assessmentNames = splitCSVRow(lines[matrikLineIdx + 1]).map(h => h.trim().toUpperCase());
+    const weightsText = splitCSVRow(lines[matrikLineIdx + 3]).map(h => h.trim());
+    
+    const idColIdx = mainHeaders.indexOf("NO MATRIK");
+    const nameColIdx = mainHeaders.indexOf("NAMA PELAJAR");
+    
+    if (idColIdx === -1 || nameColIdx === -1) return null;
+
+    const parsedStudents = [];
+    
+    for (let i = matrikLineIdx + 4; i < lines.length; i++) {
+      const rowText = lines[i].trim();
+      if (!rowText) continue;
+      
+      const cells = splitCSVRow(rowText);
+      if (cells.length < mainHeaders.length) continue;
+      
+      const id = cells[idColIdx].replace(/^"|"$/g, '').trim();
+      const name = cells[nameColIdx].replace(/^"|"$/g, '').trim();
+      
+      if (!id || id.startsWith(',') || id === "BIL" || id.toUpperCase().includes("NO MATRIK")) continue;
+
+      const scores = {};
+      
+      for (let col = 0; col < mainHeaders.length; col++) {
+        const weightStr = weightsText[col] ? weightsText[col].trim() : "";
+        if (weightStr.includes('%')) {
+          const weightVal = parseFloat(weightStr.replace('%', '')) || 10;
+          const rawScore = parseFloat(cells[col]) || 0;
+          const percentageScore = Math.min(100, Math.max(0, (rawScore / weightVal) * 100));
+          const rawAssessName = (assessmentNames[col] || mainHeaders[col] || `PENILAIAN ${col}`).trim().toUpperCase();
+          scores[rawAssessName] = percentageScore;
+        }
+      }
+
+      parsedStudents.push({
+        id: id,
+        name: name,
+        scores: scores,
+        status: "Pass"
+      });
+    }
+    return parsedStudents;
+
+  } else {
+    // --- FLAT ROW STANDARD CSV ---
+    const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim().toUpperCase());
+    const idIndex = headers.findIndex(h => h.includes('STUDENTID') || h.includes('ID') || h.includes('MATRIK'));
+    const nameIndex = headers.findIndex(h => h.includes('NAME') || h.includes('NAMA'));
+    
+    if (idIndex === -1 || nameIndex === -1) return null;
+
+    const parsedStudents = [];
+    for (let i = 1; i < lines.length; i++) {
+      const rowText = lines[i].trim();
+      if (!rowText) continue;
+      
+      const cells = splitCSVRow(rowText);
+      if (cells.length < headers.length) continue;
+      
+      const id = cells[idIndex].replace(/^"|"$/g, '').trim();
+      const name = cells[nameIndex].replace(/^"|"$/g, '').trim();
+      
+      const scores = {};
+      headers.forEach((h, idx) => {
+        if (idx !== idIndex && idx !== nameIndex) {
+          scores[h] = parseFloat(cells[idx]) || 0; 
+        }
+      });
+      
+      parsedStudents.push({
+        id: id,
+        name: name,
+        scores: scores,
+        status: "Pass"
+      });
+    }
+    return parsedStudents;
+  }
+}
+
+function splitCSVRow(rowText) {
+  let cells = [];
+  let currentCell = '';
+  let inQuotes = false;
+  for (let i = 0; i < rowText.length; i++) {
+    let char = rowText[i];
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      cells.push(currentCell);
+      currentCell = '';
+    } else {
+      currentCell += char;
+    }
+  }
+  cells.push(currentCell);
+  return cells;
+}
+
+function updateCourseMetadata() {
+  courseMetadata.code = document.getElementById('meta-course-code').value.toUpperCase();
+  courseMetadata.name = document.getElementById('meta-course-name').value.toUpperCase();
+  courseMetadata.credits = parseInt(document.getElementById('meta-course-credits').value) || 3;
+  courseMetadata.clo1 = document.getElementById('meta-clo1').value;
+  courseMetadata.clo2 = document.getElementById('meta-clo2').value;
+  courseMetadata.clo3 = document.getElementById('meta-clo3').value;
+
+}
+
+function repopulateStudentDropdown() {
+  const ddown = document.getElementById('student-dropdown');
+  ddown.innerHTML = '';
+  
+  if (uploadedCohortStudents.length === 0) {
+    ddown.innerHTML = `<option value="">Run the Observation flow to populate student diagnostics.</option>`;
+    return;
+  }
+  
+  uploadedCohortStudents.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.id} — ${s.name}`;
+    ddown.appendChild(opt);
+  });
+}
+
+function renderInteractiveLpTable(){
+  const tbody = document.getElementById('lp-table-body');
+  tbody.innerHTML = '';
+  
+  currentLpData.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="lp-input lp-input-center" type="text" value="${row.week}" id="lp-week-${idx}"></td>
+      <td><input class="lp-input" type="text" value="${row.topic}" id="lp-topic-${idx}"></td>
+      <td><input class="lp-input" type="text" value="${row.clo}" id="lp-clo-${idx}" placeholder="e.g. CLO1, CLO2"></td>
+      <td><input class="lp-input" type="text" value="${row.assessment}" id="lp-assess-${idx}" placeholder="e.g. Quiz 1 or '-'"></td>
+      <td><input class="lp-input lp-input-center" type="text" value="${row.plo}" id="lp-plo-${idx}" placeholder="e.g. PLO1"></td>
+      <td><input class="lp-input" style="text-align: right;" type="number" step="0.1" value="${row.weight}" id="lp-weight-${idx}"></td>
+      <td style="text-align: center;">
+        <button class="action-btn danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteLpRow(${idx})">×</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addNewLpRow(){
+  const nextWNum = currentLpData.length + 1;
+  currentLpData.push({
+    week: `W${nextWNum}`,
+    topic: "Lecture unit / syllabus activity text...",
+    clo: "CLO1",
+    assessment: "-",
+    plo: "-",
+    weight: 0
+  });
+  renderInteractiveLpTable();
+}
+
+function deleteLpRow(idx){
+  currentLpData.splice(idx, 1);
+  renderInteractiveLpTable();
+}
+
+// Synced automatically with raw UMT grade sheet structure
+function resetToLpTemplate(){
+  currentLpData = [
+    { week: "W1", topic: "Chapter 1: Intro - Concepts & Fundamentals", clo: "CLO1", assessment: "-", plo: "-", weight: 0 },
+    { week: "W3", topic: "Chapter 3: Process Concepts & Structures", clo: "CLO1", assessment: "QUIZ", plo: "PLO1", weight: 10 },
+    { week: "W4", topic: "Chapter 4: Algorithmic Logic Components (Scheduling)", clo: "CLO1", assessment: "TEST 1", plo: "PLO1", weight: 10 },
+    { week: "W8", topic: "Chapter 6: Process Synchronization Evaluation", clo: "CLO2", assessment: "TEST 2", plo: "PLO2", weight: 10 },
+    { week: "W13", topic: "Chapter 10: Technical Report (Cognitive Skill)", clo: "CLO2", assessment: "WRITTEN REPORT - COGNITIVE SKILL", plo: "PLO2", weight: 20 },
+    { week: "W13", topic: "Chapter 10: Technical Report (Communication Skill)", clo: "CLO3", assessment: "WRITTEN REPORT - COMMUNICATION SKILL", plo: "PLO5", weight: 5 },
+    { week: "W14", topic: "Case Study Group Presentation Review", clo: "CLO3", assessment: "PRESENTATION - COMMUNICATION SKILL", plo: "PLO5", weight: 5 }
+  ];
+  renderInteractiveLpTable();
+}
+
+function downloadLpCSV(){
+  let csvContent = "WEEK,TOPIC,CLO,ASSESSMENT_NAME,PLO_TARGET,WEIGHTAGE_PERCENT\n";
+  currentLpData.forEach((row, idx) => {
+    const wk = document.getElementById(`lp-week-${idx}`).value.replace(/,/g, " ");
+    const tp = document.getElementById(`lp-topic-${idx}`).value.replace(/,/g, " ");
+    const cl = document.getElementById(`lp-clo-${idx}`).value.replace(/,/g, " ");
+    const as = document.getElementById(`lp-assess-${idx}`).value.replace(/,/g, " ");
+    const pl = document.getElementById(`lp-plo-${idx}`).value.replace(/,/g, " ");
+    const wg = document.getElementById(`lp-weight-${idx}`).value;
+    csvContent += `"${wk}","${tp}","${cl}","${as}","${pl}",${wg}\n`;
+  });
+  
+  const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Lesson_Plan_SCDLAF_Template.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function downloadSampleGradesCSV() {
+  const activeLp = getActiveAssessments();
+  if (activeLp.length === 0) {
+    showToast("⚠️ Define at least one assessment within the lesson plan first!");
+    return;
+  }
+  
+  let csvHeader = "STUDENTID,NAME";
+  activeLp.forEach(lp => {
+    csvHeader += `,${lp.assessment}`;
+  });
+  csvHeader += "\n";
+  
+  const samples = [
+    { id: "S01", name: "Ahmad Fahmi", hi: 95, lo: 88 },
+    { id: "S04", name: "Nurul Izzah", hi: 75, lo: 45 },
+    { id: "S09", name: "Tan Wei Liang", hi: 88, lo: 40 },
+    { id: "S12", name: "Siti Aminah", hi: 55, lo: 38 }
+  ];
+  
+  let simulatedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvHeader);
+  samples.forEach(samp => {
+    let rowStr = `${samp.id},${samp.name}`;
+    activeLp.forEach((_, idx) => {
+      const score = Math.round(samp.lo + (Math.sin(idx) * 0.5 + 0.5) * (samp.hi - samp.lo));
+      rowStr += `,${score}`;
+    });
+    simulatedUri += encodeURIComponent(rowStr + "\n");
+  });
+
+  const link = document.createElement("a");
+  link.setAttribute("href", simulatedUri);
+  link.setAttribute("download", `${courseMetadata.code}_Student_Grades_Template.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function applyLpChanges(){
+  let totalWeight = 0;
+  for(let i=0; i<currentLpData.length; i++){
+    currentLpData[i].week = document.getElementById(`lp-week-${i}`).value;
+    currentLpData[i].topic = document.getElementById(`lp-topic-${i}`).value;
+    currentLpData[i].clo = document.getElementById(`lp-clo-${i}`).value;
+    currentLpData[i].assessment = document.getElementById(`lp-assess-${i}`).value;
+    currentLpData[i].plo = document.getElementById(`lp-plo-${i}`).value;
+    
+    const parsedWeight = parseFloat(document.getElementById(`lp-weight-${i}`).value) || 0;
+    currentLpData[i].weight = parsedWeight;
+    totalWeight += parsedWeight;
+  }
+
+  uploadedSCDLAF.lesson = true;
+  const statusEl = document.getElementById('upstatus-lesson');
+  statusEl.textContent = 'Customized & Loaded';
+  statusEl.className = 'up-status loaded';
+  statusEl.style.color = 'var(--green)';
+  statusEl.style.borderColor = 'var(--green)';
+  document.getElementById('upbox-lesson').classList.add('uploaded');
+
+  checkPipelineStatus();
+  showToast("✓ Customized lesson plan mapped successfully!", true);
+}
+
+function checkPipelineStatus(){
+  const allLoaded = Object.values(uploadedSCDLAF).every(v => v === true);
+  const pipeLed = document.getElementById('pipe-led');
+  const pipeStatusLabel = document.getElementById('pipe-status-label');
+  const pipeStatusMsg = document.getElementById('pipe-status-msg');
+  const observeBtn = document.getElementById('observe-trigger-btn');
+
+  if(allLoaded){
+    pipeLed.className = 'led-small active';
+    pipeStatusLabel.textContent = 'Ready to Observe';
+    pipeStatusLabel.style.color = 'var(--green)';
+    pipeStatusMsg.innerHTML = `📋 <span class="highlight">All setup files successfully aligned!</span> Click the <strong>Observe</strong> button below to map cohort parameters for <span class="highlight">${courseMetadata.code}</span>.`;
+    observeBtn.disabled = false;
+  } else {
+    pipeLed.className = 'led-small';
+    pipeStatusLabel.textContent = 'Awaiting Documents';
+    pipeStatusLabel.style.color = 'var(--amber)';
+    observeBtn.disabled = true;
+  }
+}
+
+function triggerObservationProcess() {
+  isObservationLive = true;
+  
+  const mainStatus = document.getElementById('m4-main-status');
+  mainStatus.textContent = 'Live (Observed)';
+  mainStatus.className = 'status-pill live';
+
+  document.getElementById('stab-cohort').style.opacity = '1';
+  document.getElementById('stab-student').style.opacity = '1';
+
+  if (uploadedCohortStudents.length === 0) {
+    generateCohortMatchingCurrentLP();
+  }
+
+  repopulateStudentDropdown();
+  repopulateInterventionDropdown();
+  initSCDLAFMetrics();
+
+  showToast("✓ SCDLAF Engine activated! Cohort Analytics and Student Profile sub-tabs are unlocked.", true);
+  switchSubTab('cohort');
+}
+
+function scrollToEditor() {
+  document.getElementById('lp-editor-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function loadOSDemoPresets(){
+  uploadedSCDLAF.syllabus = true;
+  uploadedSCDLAF.myca = true;
+  uploadedSCDLAF.grades = true;
+
+  courseMetadata = {
+    code: "CSF3213",
+    name: "OPERATING SYSTEM",
+    credits: 3,
+    clo1: "Explain the main concepts and structures of operating systems and security issues (C2, PLO1)",
+    clo2: "Apply appropriate methods and algorithms in solving problems related to a given operating system. (C3, PLO2)",
+    clo3: "Demonstrate effective verbal and written communication skills in oral presentation and written report on operating system. (A3, PLO5)"
+  };
+
+  document.getElementById('meta-course-code').value = courseMetadata.code;
+  document.getElementById('meta-course-name').value = courseMetadata.name;
+  document.getElementById('meta-course-credits').value = courseMetadata.credits;
+  document.getElementById('meta-clo1').value = courseMetadata.clo1;
+  document.getElementById('meta-clo2').value = courseMetadata.clo2;
+  document.getElementById('meta-clo3').value = courseMetadata.clo3;
+
+  ['syllabus','myca'].forEach(type=>{
+    const el = document.getElementById(`upstatus-${type}`);
+    const box = document.getElementById(`upbox-${type}`);
+    el.textContent = 'Loaded';
+    el.className = 'up-status loaded';
+    box.classList.add('uploaded');
+  });
+
+  // Sync with user's uploaded class CSV dataset
+  uploadedCohortStudents = [
+    { id: "S75922", name: "MARYAM MUSFIRAH BINTI ARIFF HAZIZAN", scores: { "QUIZ": 78, "TEST 1": 75, "TEST 2": 60, "WRITTEN REPORT - COGNITIVE SKILL": 72.5, "WRITTEN REPORT - COMMUNICATION SKILL": 60, "PRESENTATION - COMMUNICATION SKILL": 74 } },
+    { id: "S78521", name: "MUHAMMAD AMIR HAZIQ BIN MOHD NOOR", scores: { "QUIZ": 63, "TEST 1": 90, "TEST 2": 50, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 80, "PRESENTATION - COMMUNICATION SKILL": 80 } },
+    { id: "S80221", name: "AHMAD SYAMIL BIN AHMAD ZAM ZAM", scores: { "QUIZ": 98, "TEST 1": 75, "TEST 2": 70, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 80, "PRESENTATION - COMMUNICATION SKILL": 80 } },
+    { id: "S80226", name: "MUHAMMAD AZMEER SYAFIQ BIN AHMAD", scores: { "QUIZ": 100, "TEST 1": 70, "TEST 2": 20, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 80, "PRESENTATION - COMMUNICATION SKILL": 76 } },
+    { id: "S80279", name: "SITI HADIJAH BINTI ESHAM", scores: { "QUIZ": 100, "TEST 1": 65, "TEST 2": 60, "WRITTEN REPORT - COGNITIVE SKILL": 80, "WRITTEN REPORT - COMMUNICATION SKILL": 56, "PRESENTATION - COMMUNICATION SKILL": 60 } },
+    { id: "S80330", name: "MITHRAN A/L BALAKRISHNAN", scores: { "QUIZ": 98, "TEST 1": 75, "TEST 2": 40, "WRITTEN REPORT - COGNITIVE SKILL": 77.5, "WRITTEN REPORT - COMMUNICATION SKILL": 74, "PRESENTATION - COMMUNICATION SKILL": 60 } }
+  ];
+
+  const grEl = document.getElementById('upstatus-grades');
+  const grBox = document.getElementById('upbox-grades');
+  grEl.textContent = 'Markah Pelajar OS.csv';
+  grEl.className = 'up-status loaded';
+  grBox.classList.add('uploaded');
+
+  resetToLpTemplate();
+  applyLpChanges();
+}
+
+function initSCDLAFMetrics(){
+  document.getElementById('cohort-size-metric').textContent = uploadedCohortStudents.length;
+  
+  let passing = 0;
+  uploadedCohortStudents.forEach(s => {
+    const scoresArray = getSustainedScoresVector(s);
+    const avgScore = scoresArray.reduce((a,b)=>a+b, 0) / scoresArray.length;
+    if(avgScore >= 65) passing++;
+  });
+  const passPct = uploadedCohortStudents.length > 0 ? Math.round((passing / uploadedCohortStudents.length)*100) : 0;
+  document.getElementById('cohort-pass-metric').textContent = `${passPct}%`;
+  
+  document.getElementById('cohort-friction-metric').textContent = "0.74";
+
+  document.querySelectorAll('#syllabus-mapping-cards .card').forEach(card => {
+    card.style.opacity = '1';
+  });
+
+  drawMasteryCurve();
+  generateHeatmapGrid();
+
+  if (uploadedCohortStudents.length > 0) {
+    loadStudentProfile(uploadedCohortStudents[0].id);
+  }
+}
+
+function getActiveAssessments(){
+  return currentLpData.filter(row => row.assessment && row.assessment !== "-");
+}
+
+// SMART MATCHING UTILITY (Robust column identification logic)
+function findStudentScore(student, lpAssessment) {
+  if (!student.scores) return 70; 
+  
+  const target = lpAssessment.trim().toUpperCase();
+  
+  // 1. Direct key match
+  if (student.scores[target] !== undefined) {
+    return student.scores[target];
+  }
+  
+  // 2. Fuzzy Contain alignment matching
+  const studentKeys = Object.keys(student.scores);
+  const matchedKey = studentKeys.find(key => {
+    return target.includes(key) || key.includes(target) ||
+           (target.includes("QUIZ") && key.includes("QUIZ")) ||
+           (target.includes("TEST") && key.includes("TEST")) ||
+           (target.includes("REPORT") && key.includes("REPORT")) ||
+           (target.includes("PRESENTATION") && key.includes("PRES"));
+  });
+
+  if (matchedKey !== undefined) {
+    return student.scores[matchedKey];
+  }
+  
+  return 70; 
+}
+
+function getSustainedScoresVector(student){
+  const activeLp = getActiveAssessments();
+  const vector = [];
+  
+  activeLp.forEach((lp) => {
+    const studentScore = findStudentScore(student, lp.assessment);
+    vector.push(studentScore);
+  });
+  
+  return vector;
+}
+
+function drawMasteryCurve(){
+  const chartLines = document.getElementById('chart-lines-layer');
+  const chartDots = document.getElementById('chart-dots-layer');
+  const xaxisLabels = document.getElementById('chart-xaxis-labels');
+  
+  chartLines.innerHTML = '';
+  chartDots.innerHTML = '';
+  xaxisLabels.innerHTML = '';
+
+  const activeAssessments = getActiveAssessments();
+  if (activeAssessments.length === 0) return;
+
+  const chartWidth = 700;
+  const startX = 60;
+  const stepX = activeAssessments.length > 1 ? chartWidth / (activeAssessments.length - 1) : chartWidth;
+  const xCoords = activeAssessments.map((_, i) => startX + (i * stepX));
+  
+  function getY(score){
+    return 250 - ((score / 100) * 200);
+  }
+
+  activeAssessments.forEach((lp, i) => {
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute('x', xCoords[i]);
+    text.setAttribute('y', '270');
+    text.textContent = lp.assessment;
+    xaxisLabels.appendChild(text);
+  });
+
+  const colors = {
+    clo1: 'var(--cyan)',
+    clo2: 'var(--purple)',
+    clo3: 'var(--amber)'
+  };
+
+  const dynAverages = { clo1: [], clo2: [], clo3: [] };
+
+  activeAssessments.forEach((lp, idx) => {
+    let totalC1 = 0, countC1 = 0;
+    let totalC2 = 0, countC2 = 0;
+    let totalC3 = 0, countC3 = 0;
+
+    uploadedCohortStudents.forEach(s => {
+      const scores = getSustainedScoresVector(s);
+      const studentScore = scores[idx];
+
+      if(lp.clo.includes("CLO1")) { totalC1 += studentScore; countC1++; }
+      if(lp.clo.includes("CLO2")) { totalC2 += studentScore; countC2++; }
+      if(lp.clo.includes("CLO3")) { totalC3 += studentScore; countC3++; }
+    });
+
+    dynAverages.clo1.push(countC1 > 0 ? (totalC1 / countC1) : 80);
+    dynAverages.clo2.push(countC2 > 0 ? (totalC2 / countC2) : 70);
+    dynAverages.clo3.push(countC3 > 0 ? (totalC3 / countC3) : 75);
+  });
+
+  ['clo1', 'clo2', 'clo3'].forEach(key => {
+    const scores = dynAverages[key];
+    if (scores.length === 0) return;
+    
+    let pathD = `M ${xCoords[0]} ${getY(scores[0])}`;
+    for(let i=1; i<xCoords.length; i++){
+      pathD += ` L ${xCoords[i]} ${getY(scores[i])}`;
+    }
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute('d', pathD);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colors[key]);
+    path.setAttribute('stroke-width', '2');
+    chartLines.appendChild(path);
+
+    for(let i=0; i<xCoords.length; i++){
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute('cx', xCoords[i]);
+      circle.setAttribute('cy', getY(scores[i]));
+      circle.setAttribute('r', '4');
+      circle.setAttribute('fill', colors[key]);
+      circle.setAttribute('stroke', 'var(--bg)');
+      circle.setAttribute('stroke-width', '1.5');
+      circle.style.cursor = 'pointer';
+
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+      title.textContent = `${key.toUpperCase()} Avg: ${Math.round(scores[i])}%`;
+      circle.appendChild(title);
+
+      chartDots.appendChild(circle);
+    }
+  });
+}
+
+function generateHeatmapGrid(){
+  const grid = document.getElementById('cohort-heatmap-grid');
+  grid.innerHTML = '';
+
+  const activeAssessments = getActiveAssessments();
+  if (activeAssessments.length === 0) return;
+
+  const headerLabels = document.getElementById('heatmap-header-labels');
+  headerLabels.innerHTML = '';
+  headerLabels.style.gridTemplateColumns = `repeat(${activeAssessments.length}, 1fr)`;
+
+  activeAssessments.forEach(lp => {
+    const div = document.createElement('div');
+    div.style.fontSize = '9px';
+    div.style.overflow = 'hidden';
+    div.style.textOverflow = 'ellipsis';
+    div.style.whiteSpace = 'nowrap';
+    div.textContent = lp.assessment;
+    headerLabels.appendChild(div);
+  });
+
+  const cloTopics = [
+    { label: "CLO1 - Concepts", matchStr: "CLO1", factor: 1.05 },
+    { label: "CLO2 - Practical", matchStr: "CLO2", factor: 0.92 },
+    { label: "CLO3 - Social", matchStr: "CLO3", factor: 0.88 }
+  ];
+
+  cloTopics.forEach(topic => {
+    const rowLabel = document.createElement('div');
+    rowLabel.className = 'hm-row-lbl';
+    rowLabel.textContent = topic.label;
+    grid.appendChild(rowLabel);
+
+    const cellContainer = document.createElement('div');
+    cellContainer.className = 'hm-grid-cells';
+    cellContainer.style.gridTemplateColumns = `repeat(${activeAssessments.length}, 1fr)`;
+
+    activeAssessments.forEach((lp, idx) => {
+      let total = 0;
+      uploadedCohortStudents.forEach(s => {
+        const studentScores = getSustainedScoresVector(s);
+        total += studentScores[idx] || 75;
+      });
+      let score = Math.round((total / uploadedCohortStudents.length) * (lp.clo.includes(topic.matchStr) ? 1.0 : topic.factor));
+      
+      if(score > 100) score = 100;
+      if(score < 30) score = 45;
+
+      let colorClass = '#1c5c36';
+      if(score < 65) colorClass = '#5c2424';
+      else if(score < 75) colorClass = '#70451a';
+
+      const cell = document.createElement('div');
+      cell.className = 'hm-cell-tile';
+      cell.style.background = colorClass;
+      cell.innerHTML = `${score}%`;
+      cell.setAttribute('title', `${lp.assessment}: ${score}%`);
+
+      cellContainer.appendChild(cell);
+    });
+
+    grid.appendChild(cellContainer);
+  });
+}
+
+function loadStudentProfile(stId){
+  const s = uploadedCohortStudents.find(student => student.id === stId);
+  if(!s) return;
+
+  const activeLp = getActiveAssessments();
+  const scores = getSustainedScoresVector(s);
+  
+  let totalScoreVal = 0;
+  scores.forEach(val => totalScoreVal += val);
+  const finalScoreAvg = Math.round(totalScoreVal / scores.length);
+
+  document.getElementById('diag-st-id').textContent = s.id;
+  
+  const gradeLabel = document.getElementById('diag-st-grade');
+  gradeLabel.textContent = `${finalScoreAvg}%`;
+  gradeLabel.style.color = finalScoreAvg >= 65 ? 'var(--green)' : 'var(--red)';
+
+  const barsContainer = document.getElementById('diag-score-bars');
+  barsContainer.innerHTML = '';
+
+  activeLp.forEach((lp, idx) => {
+    const studentScore = scores[idx];
+    const isPassing = studentScore >= 65;
+
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.justifyContent = 'space-between';
+    row.style.fontSize = '11.5px';
+
+    row.innerHTML = `
+      <div style="width:130px; color:var(--text-dim); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${lp.assessment} (${lp.week})</div>
+      <div style="flex:1; margin:0 12px; height:6px; background:var(--line); border-radius:3px; overflow:hidden; position:relative;">
+        <div style="width:${studentScore}%; height:100%; background:${isPassing ? 'var(--cyan)' : 'var(--red)'};"></div>
+      </div>
+      <div style="width:40px; text-align:right; font-family:'JetBrains Mono',monospace; color:${isPassing ? 'var(--cyan)' : 'var(--red)'}; font-weight:600;">${studentScore}%</div>
+    `;
+    barsContainer.appendChild(row);
+  });
+
+  drawRadarPoints(s);
+
+  const recTitle = document.querySelector('#student-rec-box .rec-title');
+  const recText = document.getElementById('student-rec-text');
+  
+  if (finalScoreAvg >= 80) {
+    recTitle.style.color = 'var(--green)';
+    recTitle.innerHTML = '<span>🏆 Outstanding Outcome Mastery</span>';
+    recText.innerHTML = `${s.name} demonstrates complete structural command over course materials. Performing consistently above targeted thresholds (80%+).`;
+  } else if (finalScoreAvg < 65) {
+    let weakWeek = "W1";
+    activeLp.forEach((lp, idx) => {
+      if (scores[idx] < 65) weakWeek = lp.week;
+    });
+    recTitle.style.color = 'var(--red)';
+    recTitle.innerHTML = `<span>⚠️ Competency Deficit Detected at ${weakWeek}</span>`;
+    recText.innerHTML = `Student is performing under the 65% target in ${weakWeek} evaluation metrics. Coordinate targeted assistance aligned with the corresponding weekly topics immediately.`;
+  } else {
+    recTitle.style.color = 'var(--cyan)';
+    recTitle.innerHTML = '<span>📋 Satisfactory Alignment Met</span>';
+    recText.innerHTML = `${s.name} meets current structural learning alignments. Maintain standard progress checks for the upcoming modules.`;
+  }
+}
+
+function drawRadarPoints(student){
+  const radarLayer = document.getElementById('radar-polygons');
+  radarLayer.innerHTML = '';
+
+  const angles = [0, 60, 120, 180, 240, 300];
+  const center = 160;
+
+  function getPoint(index, score){
+    const r = (score / 100) * 120;
+    const rad = (angles[index] - 90) * Math.PI / 180;
+    const x = center + r * Math.cos(rad);
+    const y = center + r * Math.sin(rad);
+    return `${x},${y}`;
+  }
+
+  const scores = getSustainedScoresVector(student);
+  let c1Val = 0, c1Count = 0;
+  let c2Val = 0, c2Count = 0;
+  let c3Val = 0, c3Count = 0;
+  
+  const activeLp = getActiveAssessments();
+  activeLp.forEach((lp, idx) => {
+    const scoreVal = scores[idx] || 70;
+    if (lp.clo.includes("CLO1")) { c1Val += scoreVal; c1Count++; }
+    if (lp.clo.includes("CLO2")) { c2Val += scoreVal; c2Count++; }
+    if (lp.clo.includes("CLO3")) { c3Val += scoreVal; c3Count++; }
+  });
+
+  const clo1Avg = c1Count > 0 ? c1Val / c1Count : 75;
+  const clo2Avg = c2Count > 0 ? c2Val / c2Count : 70;
+  const clo3Avg = c3Count > 0 ? c3Val / c3Count : 72;
+
+  const stVector = [clo1Avg, clo2Avg, clo3Avg, clo1Avg - 2, clo2Avg + 3, clo3Avg - 1];
+  const avgVector = [80, 70, 75, 78, 72, 74];
+
+  // Draw class average polygon
+  let avgPoints = '';
+  for(let i=0; i<6; i++){
+    avgPoints += getPoint(i, avgVector[i]) + ' ';
+  }
+  const avgPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  avgPoly.setAttribute('points', avgPoints.trim());
+  avgPoly.setAttribute('fill', 'rgba(75,85,96,0.15)');
+  avgPoly.setAttribute('stroke', '#4B5560');
+  avgPoly.setAttribute('stroke-dasharray', '2');
+  avgPoly.setAttribute('stroke-width', '1.5');
+  radarLayer.appendChild(avgPoly);
+
+  // Draw active student polygon
+  let stPoints = '';
+  for(let i=0; i<6; i++){
+    stPoints += getPoint(i, stVector[i]) + ' ';
+  }
+  const stPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  stPoly.setAttribute('points', stPoints.trim());
+  stPoly.setAttribute('fill', 'rgba(79,227,193,0.15)');
+  stPoly.setAttribute('stroke', 'var(--cyan)');
+  stPoly.setAttribute('stroke-width', '2');
+  radarLayer.appendChild(stPoly);
+
+  for(let i=0; i<6; i++){
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    const [cx, cy] = getPoint(i, stVector[i]).split(',');
+    circle.setAttribute('cx', cx);
+    circle.setAttribute('cy', cy);
+    circle.setAttribute('r', '3.5');
+    circle.setAttribute('fill', 'var(--cyan)');
+    circle.setAttribute('stroke', 'var(--bg)');
+    circle.setAttribute('stroke-width', '1');
+    radarLayer.appendChild(circle);
+  }
+}
+
+// ── MODULE 4: DYNAMIC INTERVENTION LOGS ──
+function setInterventionType(type) {
+  activeInterventionType = type;
+  document.getElementById('int-tab-student').classList.toggle('active', type === 'student');
+  document.getElementById('int-tab-assessment').classList.toggle('active', type === 'assessment');
+  
+  repopulateInterventionDropdown();
+}
+
+function repopulateInterventionDropdown() {
+  const ddown = document.getElementById('intervention-dropdown-target');
+  const label = document.getElementById('int-select-label');
+  ddown.innerHTML = '';
+
+  if (activeInterventionType === 'student') {
+    label.textContent = "Select Target Student:";
+    if (uploadedCohortStudents.length === 0) {
+      ddown.innerHTML = `<option value="">No student dataset loaded</option>`;
+      return;
+    }
+    uploadedCohortStudents.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.id} — ${s.name}`;
+      ddown.appendChild(opt);
+    });
+  } else {
+    label.textContent = "Select Targeted Assessment Component:";
+    const activeLp = getActiveAssessments();
+    if (activeLp.length === 0) {
+      ddown.innerHTML = `<option value="">No active assessments found</option>`;
+      return;
+    }
+    activeLp.forEach(lp => {
+      const opt = document.createElement('option');
+      opt.value = lp.assessment;
+      opt.textContent = `${lp.assessment} (${lp.week})`;
+      ddown.appendChild(opt);
+    });
+  }
+}
+
+function submitInterventionAction() {
+  const target = document.getElementById('intervention-dropdown-target').value;
+  const actionText = document.getElementById('intervention-text').value.trim();
+
+  if (!target || !actionText) {
+    showToast("⚠️ Select a target and fill in the action notes first!");
+    return;
+  }
+
+  interventionLogs.push({
+    target: target,
+    type: activeInterventionType === 'student' ? 'Student' : 'Assessment',
+    text: actionText
+  });
+
+  document.getElementById('intervention-text').value = '';
+  renderInterventionLogsTable();
+  showToast("✓ Intervention support record logged!", true);
+}
+
+function renderInterventionLogsTable() {
+  const tbody = document.getElementById('intervention-log-body');
+  tbody.innerHTML = '';
+
+  if (interventionLogs.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="3" style="text-align:center; color:var(--text-faint); padding:15px;">No intervention records logged yet.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  interventionLogs.forEach(log => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-family:'JetBrains Mono',monospace; color:var(--cyan); font-weight:600;">${log.target}</td>
+      <td><span class="badge ${log.type === 'Student' ? 'ready' : 'pending'}" style="font-size:9px; padding:2px 6px;">${log.type}</span></td>
+      <td style="font-size:12px;">${log.text}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function generateCohortMatchingCurrentLP() {
+  uploadedCohortStudents = [];
+  
+  osCohortData.students.forEach(baseS => {
+    const customScores = {};
+    const activeLp = getActiveAssessments();
+    
+    activeLp.forEach((lp, idx) => {
+      let score = 75;
+      if (baseS.id === "S75922") { 
+        score = 88 + (idx % 3) * 4;
+      } else if (baseS.id === "S78521") { 
+        score = 75 + (idx % 2) * 8;
+      } else if (baseS.id === "S80221") { 
+        score = 98 - (idx % 2) * 4;
+      } else if (baseS.id === "S80226") { 
+        score = 65 + (idx % 3) * 6;
+      } else {
+        score = 65 + (idx % 4) * 6;
+      }
+      
+      if (score > 100) score = 100;
+      if (score < 0) score = 0;
+      customScores[lp.assessment.toUpperCase()] = score;
+    });
+
+    uploadedCohortStudents.push({
+      id: baseS.id,
+      name: baseS.name,
+      scores: customScores,
+      status: "Pass"
+    });
+  });
+}
+
+// ── INITIALIZATION ──
 
 // ── INIT ──
 renderChat('net001');
-renderM4('wba');
+  // Set analytics tabs locked until Observe is executed
+  document.getElementById('stab-cohort').style.opacity = '0.35';
+  document.getElementById('stab-student').style.opacity = '0.35';
+  
+  resetToLpTemplate();
 </script>
 </body>
 </html>
