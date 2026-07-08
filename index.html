@@ -151,13 +151,17 @@
   .empty-note{border:1px dashed var(--line);padding:22px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-faint);letter-spacing:.04em;}
 
   /* ── MODULE 2: roles + sources ── */
-  .roles-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .roles-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:20px;}
   .role-chip{
-    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
-    padding:7px 12px;border:1px solid var(--line);background:var(--bg-panel);
-    color:var(--text-dim);cursor:pointer;transition:all .15s;
+    padding:14px 16px;border:1px solid var(--line);background:var(--bg-panel);
+    cursor:pointer;transition:all .15s;text-align:left;
   }
-  .role-chip:hover,.role-chip.on{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim);}
+  .role-chip:hover,.role-chip.on{border-color:var(--cyan);background:var(--cyan-dim);}
+  .role-head{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--text);margin-bottom:7px;}
+  .role-chip:hover .role-head,.role-chip.on .role-head{color:var(--cyan);}
+  .role-desc{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:8px;}
+  .role-good{font-size:11.5px;color:var(--green);line-height:1.5;}
+  .catch-note{color:var(--green);}
   .src-row{display:flex;gap:8px;margin-bottom:10px;}
   .src-inp{
     flex:1;background:var(--bg);border:1px solid var(--line);
@@ -544,7 +548,7 @@
   <nav>
     <button class="tab active" data-target="home"><span class="idx">00</span> Home</button>
     <button class="tab" data-target="module1"><span class="idx">01</span> Module 1 <span class="led ready"></span></button>
-    <button class="tab" data-target="module2"><span class="idx">02</span> Module 2 <span class="led pending"></span></button>
+    <button class="tab" data-target="module2"><span class="idx">02</span> Module 2 <span class="led ready"></span></button>
     <button class="tab" data-target="module3"><span class="idx">03</span> Module 3 <span class="led ready"></span></button>
     <button class="tab" data-target="module4"><span class="idx">04</span> Module 4 <span class="led ready"></span></button>
   </nav>
@@ -598,7 +602,7 @@
           <h3>Module 2 — AI Co-Creation Assessment</h3>
           <p>Groups of up to three students curate 5–12 credible sources. NotebookLM synthesizes them into structured reports, evidence maps, and citations.</p>
         </div>
-        <span class="badge pending">In Progress</span>
+        <span class="badge ready">Ready</span>
       </li>
       <li>
         <span class="idx-num">03</span>
@@ -739,13 +743,13 @@
   <!-- ══ MODULE 2 ══ -->
   <section class="screen" id="module2">
     <div class="hero">
-      <span class="status-pill pending">In Progress</span>
+      <span class="status-pill">Ready</span>
       <p class="path">root/<span>module_02</span>/ai-cocreation-assessments</p>
       <h1>Module 2 — AI Co-Creation Assessment<span class="cursor"></span></h1>
       <p>Students form groups of up to three to curate 5–12 credible technical sources. NotebookLM synthesizes these into structured evidence maps, reports, summaries, and citations — with each group member assigned a specific role in the process.</p>
     </div>
     <div class="meta">
-      <span class="meta-chip">STATUS: IN PROGRESS</span>
+      <span class="meta-chip">STATUS: READY</span>
       <span class="meta-chip">TOOL: NOTEBOOKLM</span>
       <span class="meta-chip">TIER 1</span>
     </div>
@@ -763,11 +767,31 @@
     <div style="background:var(--bg-panel);border:1px solid var(--line);padding:22px;margin-bottom:28px;">
       <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px;">Assign Roles (click to select)</p>
       <div class="roles-wrap" id="roles">
-        <div class="role-chip" onclick="this.classList.toggle('on')">🔍 Source Curator</div>
-        <div class="role-chip" onclick="this.classList.toggle('on')">💬 Prompt Lead</div>
-        <div class="role-chip" onclick="this.classList.toggle('on')">✅ Verifier</div>
-        <div class="role-chip" onclick="this.classList.toggle('on')">🔀 Synthesizer</div>
-        <div class="role-chip" onclick="this.classList.toggle('on')">📊 Presenter</div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">
+          <div class="role-head">🔍 Source Curator</div>
+          <div class="role-desc">Finds and uploads relevant, credible sources into the shared NotebookLM notebook.</div>
+          <div class="role-good">Group 5 curated 7 sources from 2025–2026 spanning technical, defensive, and regulatory angles — not just one narrow slice of the topic.</div>
+        </div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">
+          <div class="role-head">💬 Prompt Lead</div>
+          <div class="role-desc">Designs and runs the prompt sequences that query NotebookLM for summaries, comparisons, and artifacts.</div>
+          <div class="role-good">Prompts that ask NotebookLM to compare defensive approaches across all uploaded sources, not just "summarize this."</div>
+        </div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">
+          <div class="role-head">✅ Verifier</div>
+          <div class="role-desc">Cross-checks every AI-generated claim and artifact against the original source PDFs to catch hallucinations.</div>
+          <div class="role-good">Group 5's Verifier caught a fabricated date ("2021") and garbled jargon ("matris", "DGN/PPG") in an AI infographic, then shipped a corrected version.</div>
+        </div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">
+          <div class="role-head">🔀 Synthesizer</div>
+          <div class="role-desc">Turns raw NotebookLM output into structured, citable report prose.</div>
+          <div class="role-good">Group 11 rewrote NotebookLM's summaries into a properly cited report section, since NotebookLM doesn't generate APA citations on its own.</div>
+        </div>
+        <div class="role-chip" onclick="this.classList.toggle('on')">
+          <div class="role-head">📊 Presenter</div>
+          <div class="role-desc">Assembles the final ZIP submission and leads the presentation of findings.</div>
+          <div class="role-good">Following the assignment's exact 6-folder structure (01_Report … 06_Verification) so the submission is complete and easy to grade.</div>
+        </div>
       </div>
       <div style="height:1px;background:var(--line);margin:18px 0;"></div>
       <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;">
@@ -783,6 +807,69 @@
       <button class="gen-btn" id="gen-btn" onclick="doGen()" disabled>
         ▶ GENERATE WITH NOTEBOOKLM ENGINE
       </button>
+    </div>
+
+    <div class="label">Case Study Evidence<span class="rule"></span></div>
+    <div class="subjects-acc" style="margin-bottom:10px;">
+
+      <details>
+        <summary>
+          <span><span class="code mono">CASE.01</span>Group 11 — Email Security &amp; Spam/Phishing Detection</span>
+          <span class="chev">▾</span>
+        </summary>
+        <div class="panel">
+          <p><strong>Course &amp; group:</strong> CSF3233 Cybersecurity, 3 members, one of 24 lecturer-approved topics.</p>
+          <p style="margin-top:8px"><strong>Sources curated (6):</strong> NIST SP 800-45v2 (Guidelines on Electronic Mail Security), NIST SP 800-177r1 (Trustworthy Email), NIST TN 2276 (Phish Scale User Guide), Microsoft Digital Defense Report 2024, Butavicius &amp; Parsons (2015), Nmachi (2023).</p>
+          <p style="margin-top:8px"><strong>NotebookLM artifacts:</strong> a Phishing Analysis &amp; Detection Difficulty mind map, and an infographic explaining the NIST Phish Scale (email-cue scoring + premise alignment).</p>
+          <p style="margin-top:8px"><strong>Manual Verification — what the Verifier caught:</strong></p>
+          <p class="catch-note" style="margin-top:4px">The Phish Scale infographic simplified the scoring mechanism without explaining how the difficulty rating is actually calculated; the mind map omitted SPF/DKIM/DMARC email-authentication protocols and ML/AI-based detection despite both being covered in the uploaded sources; and the infographic implied detection difficulty depends only on cues and premise alignment, understating AI-driven spear-phishing and Business Email Compromise trends the sources flagged as significant. Each finding was logged with a stated correction before submission.</p>
+          <p style="margin-top:8px"><strong>Group reflection:</strong> NotebookLM sped up cross-source comparison and summarization, but couldn't fetch outside sources, generate proper citations, or reliably handle highly technical content — manual work stayed essential for credibility evaluation and argument construction. The group said they'd use it again as a support tool, not a replacement.</p>
+          <div class="subjects" style="margin-top:12px;margin-bottom:0;">
+            <a class="subject-link" href="assets/module2-samples/Group11_Report.pdf" target="_blank" rel="noopener">
+              <span><span class="code mono">SAMPLE</span>View Group 11 Submitted Report ↗</span>
+              <span class="go">PDF · 11 pages</span>
+            </a>
+            <a class="subject-link" href="assets/module2-samples/Group11_Prompts_Report.pdf" target="_blank" rel="noopener">
+              <span><span class="code mono">EVIDENCE</span>View Prompts &amp; Responses Log ↗</span>
+              <span class="go">PDF · NotebookLM prompt evidence</span>
+            </a>
+            <a class="subject-link" href="assets/module2-samples/Group11_Verification_Report.pdf" target="_blank" rel="noopener">
+              <span><span class="code mono">VERIFY</span>View Manual Verification Report ↗</span>
+              <span class="go">PDF · anti-hallucination register</span>
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span><span class="code mono">CASE.02</span>Group 5 — Ransomware: Trends, Impact &amp; Defensive Strategies</span>
+          <span class="chev">▾</span>
+        </summary>
+        <div class="panel">
+          <p><strong>Course &amp; group:</strong> CSF3233 Cybersecurity, 3 members, one of 24 lecturer-approved topics.</p>
+          <p style="margin-top:8px"><strong>Sources curated (7):</strong> seven 2025–2026 journal articles and preprints covering ML-based ransomware detection, AI-integrity attacks, SME cybersecurity defense, and mandatory regulatory reporting regimes (UK NIS, EU NIS2).</p>
+          <p style="margin-top:8px"><strong>NotebookLM artifacts:</strong> a 3-panel infographic ("The New Era of Ransomware: From Digital Extortion to AI Sabotage") and an audio overview generated directly from the group's uploaded sources.</p>
+          <p style="margin-top:8px"><strong>Manual Verification — a caught hallucination, with before/after proof:</strong></p>
+          <p class="catch-note" style="margin-top:4px">The AI-generated infographic originally claimed global losses would reach "$285 billion by 2021" — a date already in the past relative to a different $265B/2025 figure on the same graphic — and used garbled technical terms: "matris" instead of "matrix," ".liS" instead of TensorFlow's real <code>.h5</code> extension, "sendbases" instead of "sandbox," and "DGN/PPG" instead of the real reinforcement-learning algorithms DQN/PPO. The group circled every anomaly on the original image, logged each one in a verification register, and produced a corrected version — the final report body text uses the corrected "$265 billion by 2031" figure throughout.</p>
+          <p style="margin-top:8px"><strong>Accessibility angle:</strong> one member's individual reflection described NotebookLM's audio overviews and infographics as genuine accommodations for dyslexia — auditory and visual restatement of dense technical material "leveling the academic playing field... without compromising analytical rigour."</p>
+          <div class="subjects" style="margin-top:12px;margin-bottom:0;">
+            <a class="subject-link" href="assets/module2-samples/Group05_Ransomware_Report.pdf" target="_blank" rel="noopener">
+              <span><span class="code mono">SAMPLE</span>View Group 5 Submitted Report ↗</span>
+              <span class="go">PDF · 12 pages</span>
+            </a>
+            <a class="subject-link" href="assets/module2-samples/Group05_Impact_Analysis_of_Ransomware.png" target="_blank" rel="noopener">
+              <span><span class="code mono">EVIDENCE</span>View Impact Analysis Infographic ↗</span>
+              <span class="go">PNG · NotebookLM evidence</span>
+            </a>
+            <a class="subject-link" href="assets/module2-samples/Group05_Evolution_of_Ransomware_Tactics_Anomaly_Marked.png" target="_blank" rel="noopener">
+              <span><span class="code mono">CAUGHT</span>View Anomaly-Marked Infographic ↗</span>
+              <span class="go">PNG · circled hallucinations</span>
+            </a>
+          </div>
+        </div>
+      </details>
+
     </div>
   </section>
 
