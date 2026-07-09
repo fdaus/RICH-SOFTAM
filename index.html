@@ -2420,3 +2420,319 @@ renderChat('net001');
 </script>
 </body>
 </html>
+
+<div id="ai-chat-wrapper" style="position: fixed; bottom: 20px; right: 20px; z-index: 999999; font-family: 'Helvetica Neue', Arial, sans-serif;">
+    <!-- Butang Utama Chatbot -->
+    <button id="chat-toggle-btn" style="width: 60px; height: 60px; border-radius: 50%; background-color: #1a365d; color: white; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+        🤖
+    </button>
+
+    <!-- Kotak Kandungan Chatbot -->
+    <div id="chat-box-container" style="display: none; width: 340px; height: 450px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); border: 1px solid #e2e8f0; position: fixed; bottom: 95px; right: 20px; flex-direction: column; overflow: hidden;">
+        
+        <!-- Bahagian Header -->
+        <div style="background: #1a365d; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 14px;">💬 Asisten AI Makmal FSKM</span>
+                <span style="font-size: 10px; font-weight: normal; opacity: 0.8;">Pembantu Pintar Google Sites</span>
+            </div>
+            
+            <!-- Menu Dropdown Pilihan Bahasa Suara -->
+            <div style="display: flex; align-items: center; margin-left: auto; margin-right: 10px;">
+                <label for="ai-voice-lang" style="font-size: 11px; font-weight: normal; margin-right: 4px; opacity: 0.9;">Suara:</label>
+                <select id="ai-voice-lang" style="font-size: 11px; background: #2b6cb0; color: white; border: 1px solid #4299e1; border-radius: 4px; padding: 2px 4px; cursor: pointer; outline: none;">
+                    <option value="ms" selected>BM 🇲🇾</option>
+                    <option value="en">EN 🇬🇧</option>
+                </select>
+            </div>
+            <button id="close-chat" style="background: none; border: none; color: white; cursor: pointer; font-size: 16px;">✕</button>
+        </div>
+
+        <!-- 🔊 Panel Kawalan Audio (Pause, Resume, Stop) -->
+        <div id="audio-control-panel" style="background: #edf2f7; padding: 6px 15px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #4a5568;">
+            <span>Kawalan Suara:</span>
+            <div style="display: flex; gap: 5px;">
+                <button onclick="pauseSpeech()" title="Jeda (Pause)" style="background: #ffffff; border: 1px solid #cbd5e0; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 11px;">⏸️ Jeda</button>
+                <button onclick="resumeSpeech()" title="Sambung (Resume)" style="background: #ffffff; border: 1px solid #cbd5e0; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 11px;">▶️ Sambung</button>
+                <button onclick="stopSpeech()" title="Berhenti (Stop)" style="background: #e53e3e; border: none; color: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 11px; font-weight: bold;">⏹️ Henti</button>
+            </div>
+        </div>
+        
+        <!-- Zon Mesej Perbualan -->
+        <div id="chat-messages-zone" style="flex: 1; padding: 15px; overflow-y: auto; background: #f7fafc; font-size: 13px;">
+            <div style="background: #e2e8f0; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; max-width: 85%; color: #2d3748; line-height: 1.4; position: relative;">
+                Hai! Saya pembantu AI Fakulti Sains Komputer dan Matematik (FSKM). Saya boleh membantu anda menjawab sebarang soalan berdasarkan maklumat yang ada di laman web ini. Ada apa yang boleh saya bantu?
+                <button class="speak-btn" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:5px; opacity:0.6; display:inline-block; padding:0; vertical-align:middle;">🔊</button>
+            </div>
+        </div>
+
+        <!-- Bahagian Input Pengguna -->
+        <div style="padding: 10px; border-top: 1px solid #e2e8f0; display: flex; background: white;">
+            <input type="text" id="ai-user-input" placeholder="Tanya tentang maklumat di halaman ini..." style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; outline: none;">
+            <button id="ai-send-btn" style="background: #1a365d; color: white; border: none; padding: 0 15px; margin-left: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">Hantar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enjin fonetik pintar untuk menukar teks Melayu ke sebutan English yang natural (jika peranti tiada suara BM asli)
+function convertMalayToEnglishPhonetic(text) {
+    let map = [
+        { r: /\bsaya\b/gi, t: "siah" },
+        { r: /\bboleh\b/gi, t: "bo-lay" },
+        { r: /\bmembantu\b/gi, t: "hum-ban-too" },
+        { r: /\banda\b/gi, t: "un-duh" },
+        { r: /\bhai\b/gi, t: "hi" },
+        { r: /\bsiapa\b/gi, t: "see-up-uh" },
+        { r: /\bapa\b/gi, t: "up-uh" },
+        { r: /\bada\b/gi, t: "uh-duh" },
+        { r: /\bweb\b/gi, t: "web" },
+        { r: /\blaman\b/gi, t: "lah-mun" },
+        { r: /\bhalaman\b/gi, t: "hah-lah-mun" },
+        { r: /\bini\b/gi, t: "ee-nee" },
+        { r: /\bmaklumat\b/gi, t: "muck-loo-mut" },
+        { r: /\bsoalan\b/gi, t: "so-uh-lun" },
+        { r: /\bmenjawab\b/gi, t: "mun-jah-wub" },
+        { r: /\bberdasarkan\b/gi, t: "bur-dar-sar-kun" },
+        { r: /\bfakulti\b/gi, t: "fah-kool-tee" },
+        { r: /\bsains\b/gi, t: "science" },
+        { r: /\bkomputer\b/gi, t: "computer" },
+        { r: /\bmatematik\b/gi, t: "mathematics" },
+        { r: /\bpembantu\b/gi, t: "pum-bun-too" },
+        { r: /\bmaaf\b/gi, t: "mah-uf" },
+        { r: /\btiada\b/gi, t: "tee-uh-duh" },
+        { r: /\bdi\b/gi, t: "dee" },
+        { r: /\btertera\b/gi, t: "tur-tur-uh" },
+        { r: /a\b/gi, t: "uh" },
+        { r: /c/gi, t: "ch" },
+        { r: /ny/gi, t: "ny" },
+        { r: /sy/gi, t: "sh" }
+    ];
+    
+    let processed = text;
+    map.forEach(item => {
+        processed = processed.replace(item.r, item.t);
+    });
+    return processed;
+}
+
+// ⏸️ Fungsi Jeda Audio Global
+function pauseSpeech() {
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        window.speechSynthesis.pause();
+    }
+}
+
+// ▶ ... Fungsi Sambung Audio Global
+function resumeSpeech() {
+    if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+    }
+}
+
+// ⏹️ Fungsi Hentikan Audio Sepenuhnya Global
+function stopSpeech() {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+}
+
+// Fungsi global pembaca teks dengan tapis simbol & kawalan bahasa pilihan
+function speakText(text) {
+    if (!('speechSynthesis' in window)) {
+        alert("Maaf, browser anda tidak menyokong fungsi suara.");
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const selectedLangMode = document.getElementById("ai-voice-lang").value;
+
+    // ==========================================
+    // 🧼 PROSES PEMBERSIHAN TEKS (ELAK SEBUT SIMBOL)
+    // ==========================================
+    let cleanText = text;
+    cleanText = cleanText.replace(/🔊/g, ''); // Buang emoji suara
+    cleanText = cleanText.replace(/<\/?[^>]+(>|$)/g, ""); // Buang tag HTML (<br>, <strong> dsb)
+    cleanText = cleanText.replace(/[\*\#\-\•]/g, ''); // Buang simbol markdown (*, #, •)
+    
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = cleanText;
+    cleanText = tempDiv.textContent || tempDiv.innerText || "";
+    cleanText = cleanText.trim();
+    // ==========================================
+
+    const voices = window.speechSynthesis.getVoices();
+    let selectedVoice = null;
+    let isEnglishVoiceForMalay = false;
+
+    if (selectedLangMode === "ms") {
+        // Cari suara asli Melayu Malaysia (ms-MY)
+        selectedVoice = voices.find(voice => voice.lang === 'ms-MY' || voice.lang === 'ms_MY');
+        
+        // Sekat Indonesia: Cari suara 'ms' generic selain Indonesia
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith('ms') && !voice.lang.includes('ID') && !voice.lang.includes('id'));
+        }
+
+        // Jika tiada juga, gunakan English dan aktifkan mod fonetik
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith('en-US')) || 
+                            voices.find(voice => voice.lang.startsWith('en-GB')) ||
+                            voices.find(voice => voice.lang.startsWith('en'));
+            isEnglishVoiceForMalay = true;
+        }
+    } else {
+        // Jika pengguna memilih bahasa English
+        selectedVoice = voices.find(voice => voice.lang.startsWith('en-US')) || 
+                        voices.find(voice => voice.lang.startsWith('en-GB')) ||
+                        voices.find(voice => voice.lang.startsWith('en'));
+    }
+
+    // Atasi masalah terhenti: Pecahkan teks panjang mengikut ayat
+    const sentences = cleanText.match(/[^.!?]+[.!?]*/g) || [cleanText];
+
+    sentences.forEach(sentence => {
+        let trimmedSentence = sentence.trim();
+        if (trimmedSentence.length === 0) return;
+
+        if (selectedLangMode === "ms" && isEnglishVoiceForMalay) {
+            trimmedSentence = convertMalayToEnglishPhonetic(trimmedSentence);
+        }
+
+        const utterance = new SpeechSynthesisUtterance(trimmedSentence);
+        
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            utterance.lang = selectedVoice.lang;
+        } else {
+            utterance.lang = (selectedLangMode === "ms") ? 'ms-MY' : 'en-US'; 
+        }
+
+        utterance.rate = 0.95; 
+        utterance.pitch = 1.0;
+
+        window.speechSynthesis.speak(utterance);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const toggleBtn = document.getElementById("chat-toggle-btn");
+    const chatBox = document.getElementById("chat-box-container");
+    const closeBtn = document.getElementById("close-chat");
+    const sendBtn = document.getElementById("ai-send-btn");
+    const userInput = document.getElementById("ai-user-input");
+    const messagesZone = document.getElementById("chat-messages-zone");
+
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = window.speechSynthesis.getVoices;
+        }
+    }
+
+    // Aktifkan fungsi klik pembicara pada mesej selamat datang asal
+    const welcomeMsgBox = messagesZone.querySelector('div');
+    const welcomeSpeakBtn = welcomeMsgBox.querySelector('.speak-btn');
+    if (welcomeSpeakBtn) {
+        welcomeSpeakBtn.addEventListener('click', function() {
+            speakText(welcomeMsgBox.innerText);
+        });
+    }
+
+    const PROXY_ENDPOINT = "https://web2.megatechsolution.org/gimini_proxy.php";
+    let chatHistory = [];
+
+    if (localStorage.getItem("ai_chat_open") === "true") { chatBox.style.display = "flex"; }
+
+    toggleBtn.addEventListener("click", () => {
+        const isHidden = chatBox.style.display === "none" || chatBox.style.display === "";
+        chatBox.style.display = isHidden ? "flex" : "none";
+        localStorage.setItem("ai_chat_open", isHidden);
+        messagesZone.scrollTop = messagesZone.scrollHeight;
+    });
+
+    closeBtn.addEventListener("click", () => {
+        chatBox.style.display = "none";
+        localStorage.setItem("ai_chat_open", "false");
+        // NOTA: window.speechSynthesis.cancel() dibuang sengaja di sini supaya suara kekal berbunyi walaupun tetingkap chat ditutup!
+    });
+
+    async function getAIResponse(contents, systemInstruction) {
+        const payload = {
+            "contents": contents,
+            "systemInstruction": { "parts": [{ "text": systemInstruction }] }
+        };
+
+        try {
+            const response = await fetch(PROXY_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const text = await response.text();
+            try {
+                const result = JSON.parse(text);
+                if (result.error) return "Maaf, perkhidmatan AI sedang sibuk atau mengalami ralat proksi.";
+                let finalReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!finalReply) return "Maaf, ralat membaca struktur respons daripada AI.";
+                
+                finalReply = finalReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                finalReply = finalReply.replace(/\* (.*?)\n/g, '• $1<br>');
+                return finalReply.replace(/\n/g, '<br>');
+            } catch (jsonErr) {
+                return "<strong>⚠️ Ralat Pelayan Proksi:</strong><br><small style='font-family:monospace;'>" + text.substring(0, 300) + "</small>";
+            }
+        } catch (err) {
+            return "Ralat sambungan rangkaian ke pelayan proksi: " + err.message;
+        }
+    }
+
+    async function sendMessage() {
+        const msg = userInput.value.trim();
+        if (!msg) return;
+
+        messagesZone.innerHTML += `<div style="background: #ebf8ff; color: #2b6cb0; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; max-width: 85%; margin-left: auto; text-align: right; font-weight: 500; line-height: 1.4;">${msg}</div>`;
+        userInput.value = "";
+        messagesZone.scrollTop = messagesZone.scrollHeight;
+
+        chatHistory.push({ "role": "user", "parts": [{ "text": msg }] });
+
+        const loadingId = "ai-loading-" + Date.now();
+        messagesZone.innerHTML += `<div id="${loadingId}" style="background: #e2e8f0; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; max-width: 45%; color: #718096; font-style: italic;">Sedang membaca halaman...</div>`;
+        messagesZone.scrollTop = messagesZone.scrollHeight;
+
+        const currentPageText = document.body.innerText || "";
+        const dynamicSystemInstruction = `Anda adalah AI Pembantu Rasmi bagi maklumat web Makmal FSKM UMT.
+Jawab semua soalan pengguna dalam Bahasa Melayu yang sopan, ringkas dan padat.
+Anda WAJIB menjawab hanya berpandukan data teks dari halaman web semasa yang dibekalkan di bawah. Jika tiada jawapan di dalam teks tersebut, jawab dengan jujur bahawa maklumat tidak tertera di halaman web ini.
+
+MAKLUMAT KANDUNGAN HALAMAN WEB SEMASA JALANAN:
+${currentPageText}`;
+
+        const aiReply = await getAIResponse([...chatHistory], dynamicSystemInstruction);
+
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) loadingEl.remove();
+
+        const targetResponseId = "ai-resp-" + Date.now();
+        messagesZone.innerHTML += `<div id="${targetResponseId}" style="background: #e2e8f0; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; max-width: 85%; color: #2d3748; line-height: 1.4;">
+            ${aiReply}
+            <button class="speak-btn" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:5px; opacity:0.6; display:inline-block; padding:0; vertical-align:middle;">🔊</button>
+        </div>`;
+        
+        const newResponseEl = document.getElementById(targetResponseId);
+        const newSpeakBtn = newResponseEl.querySelector('.speak-btn');
+        newSpeakBtn.addEventListener('click', function() {
+            speakText(newResponseEl.innerText);
+        });
+
+        messagesZone.scrollTop = messagesZone.scrollHeight;
+        chatHistory.push({ "role": "model", "parts": [{ "text": aiReply }] });
+        if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", (e) => { if(e.key === 'Enter') sendMessage(); });
+});
+</script>
